@@ -1,22 +1,3 @@
-/*
-int partial_array_copy() {
-    int multi_a[5][5];
-    int multi_b[5][5];
-
-
-    int i = 0;
-    while (i < 5) {
-        multi_a[3][i] = i * i;
-        i = i + 1;
-    }
-    multi_b[2] = multi_a[3];
-
-    i = 0;
-    while (i < 5) {
-        //output: i^2
-        write(multi_b[2][i]);
-        i = i + 1;
-    }
-    return 0;
+int main(){
+	a[1.2] = 1; // 完全符合Exp定义的格式，应该在第二章中被检测出来
 }
-*/
