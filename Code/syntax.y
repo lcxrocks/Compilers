@@ -63,7 +63,6 @@ ExtDefList  : ExtDef ExtDefList             {$$ = insert_node("ExtDefList", @$, 
 ExtDef      : Specifier ExtDecList SEMI     {$$ = insert_node("ExtDef", @$, 3, $1, $2, $3);}
             | Specifier SEMI                {$$ = insert_node("ExtDef", @$, 2, $1, $2);}
             | Specifier FunDec CompSt       {$$ = insert_node("ExtDef", @$, 3, $1, $2, $3);}
-            | Specifier FunDec SEMI         {$$ = insert_node("ExtDef", @$, 3, $1, $2, $3);}
             | error SEMI                    {print_error("Wrong ExtDef1");}
             | error RC                      {print_error("Wrong ExtDef2");}
             ;
@@ -236,7 +235,7 @@ void print_error(char *msg){
     int lineno = yylineno;
     // int length = strlen(msg);
     // if(strcmp(msg+length-3, "';'")==0) lineno--;
-    fprintf(stderr, "Error type B at Line %d: %s.\n", lineno, msg);
+    fprintf(stderr, "\033[31mError type B at Line: %d: \033[0m%s.\n", lineno, msg);
 }
 
 int yyparse_wrap() {

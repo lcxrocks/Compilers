@@ -1,14 +1,25 @@
 %{
     #include "syntax.tab.h"
     #include <stdio.h>
-    #include "common.h"
-    
     int yycolumn = 1;
     #define YY_USER_ACTION \
         yylloc.first_line   = yylloc.last_line = yylineno; \
         yylloc.first_column = yycolumn; \
         yylloc.last_column  = yycolumn + yyleng - 1; \
         yycolumn += yyleng;
+    
+    struct Node {
+        char *token_name;
+        struct Node *first_child;
+        struct Node *next_sib;
+        int first_line;
+        int is_token;
+        union{
+            unsigned int int_value;
+            float float_value;
+            char *token_text;
+        };
+    };
     int token_err = 0;
     int nested_comment = 0;
     int cmt_start_line = 0;
@@ -68,13 +79,13 @@ ERRID [0-9][_a-zA-Z0-9]*
 <CMT>"*/"   {BEGIN(INITIAL);}
 <CMT>\n     {}
 <CMT>.      {}
-<CMT><<EOF>> {token_err++; fprintf(stderr, "Error type B at Line %d: Open Multi-line comment (Start at line[%d]).\n", yylineno, cmt_start_line); BEGIN(INITIAL);}
-[*]+[/]     {token_err++; fprintf(stderr, "Error type B at Line %d: Multi-line comment without start.\n", yylineno);}
-{ERROCT}    {token_err++; fprintf(stderr, "Error type A at Line %d: Wrong OCT format.\n", yylineno); return INT;}
-{ERRHEX}    {token_err++; fprintf(stderr, "Error type A at Line %d: Wrong HEX format.\n", yylineno); return INT;}
-{ERRFLOAT1} {token_err++; fprintf(stderr, "Error type A at Line %d: Wrong FLOAT format, missing the exponentiation.\n", yylineno); return FLOAT;}
-{ERRID}     {token_err++; fprintf(stderr, "Error type A at Line %d: Wrong ID format, numbers shouldn't be the prefix.\n", yylineno); return ID;}
-.           {token_err++; fprintf(stderr, "Error type A at Line %d: Mysterious characters \'%s\'.\n", yylineno, yytext);}
+<CMT><<EOF>> {token_err++; fprintf(stderr, "\033[31mError type B at Line: %d: \033[0mOpen Multi-line comment (Start at line[%d]).\n", yylineno, cmt_start_line); BEGIN(INITIAL);}
+[*]+[/]     {token_err++; fprintf(stderr, "\033[31mError type B at Line: %d: \033[0mMulti-line comment without start.\n", yylineno);}
+{ERROCT}    {token_err++; fprintf(stderr, "\033[31mError type A at Line: %d: \033[0mWrong OCT format.\n", yylineno); return INT;}
+{ERRHEX}    {token_err++; fprintf(stderr, "\033[31mError type A at Line: %d: \033[0mWrong HEX format.\n", yylineno); return INT;}
+{ERRFLOAT1} {token_err++; fprintf(stderr, "\033[31mError type A at Line: %d: \033[0mWrong FLOAT format, missing the exponentiation.\n", yylineno); return FLOAT;}
+{ERRID}     {token_err++; fprintf(stderr, "\033[31mError type A at Line: %d: \033[0mWrong ID format, numbers shouldn't be the prefix.\n", yylineno); return ID;}
+.           {token_err++; fprintf(stderr, "\033[31mError type A at Line: %d: \033[0mMysterious characters \'%s\'.\n", yylineno, yytext);}
 %%
 int yywrap(){
     return 1;
@@ -89,7 +100,7 @@ void getToken(char *token_name, char* token_text){
     strcpy(yylval.node->token_text, token_text);
     yylval.node->first_child = NULL;
     yylval.node->next_sib = NULL;
-    yylval.node->first_line = yylineno;
+    yylval.node->first_line = 0;
     yylval.node->is_token = 1;
     if(strcmp(token_name, "OCT")==0){
         sscanf(token_text, "%o", &yylval.node->int_value);

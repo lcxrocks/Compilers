@@ -11,9 +11,6 @@ extern int handled_err;
 extern int token_err;
 void print_tree(struct Node* cur, int depth);
 int yyparse_wrap();
-void parsing(struct Node* root);
-void show_table();
-void check_undefined_func();
 //#define YYABORT // yyparse() immediately returns after syntax error 
 
 #ifdef YYDEBUG
@@ -36,10 +33,8 @@ int main(int argc, char** argv){
     yyrestart(f);
     yyparse_wrap();
     if(handled_err<prod_err) 
-        fprintf(stderr, "Error type B at Line %d: Mysterious syntax error.\n", yylineno);
+        fprintf(stderr, "\033[31mError type B at Line: %d: \033[0mMysterious syntax error.\n", yylineno);
     if((prod_err+token_err)==0)
-        parsing(root);
-    //show_table();
-    check_undefined_func();
+        print_tree(root, 0);
     return 0;
 }
