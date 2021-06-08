@@ -2,9 +2,8 @@
 
 int depth; // indicate current stack depth
 struct Table_ Table = { 0 };
-
-extern InterCodes *head;
-extern InterCodes *tail;
+void CompSt(struct Node *com, Type *func_type);
+void show_table();
 
 unsigned int hash_pjw(char *name){
     unsigned int val = 0, i;
@@ -16,12 +15,9 @@ unsigned int hash_pjw(char *name){
 }
 
 void insert(TableEntry *sym){
-    //printf("inserting [%s], type: %d\n", sym->sym_name, sym->sym_type->kind);
+    //printf("inserting [%s]\n", sym->sym_name);
     //show_table();
-    // lab3
-    sym->ir_var_no = NULL;
-    // lab3
-    int index = hash_pjw(sym->sym_name);    
+    int index = hash_pjw(sym->sym_name);
     sym->next_hash = Table.hashTable[index];
     Table.hashTable[index] = sym;
     sym->next_stack = Table.stack[depth];
@@ -60,13 +56,10 @@ void delete(int stack_depth){
 
 TableEntry *search(char *sym_name){
     int index = hash_pjw(sym_name);
-    //log("In search for %s, index: %d\n", sym_name, index);
     TableEntry *first_entry = Table.hashTable[index];
     TableEntry *p = first_entry;
     int found = 0;
-    if(p==NULL) {
-        return p;
-    }
+    if(p==NULL) return p;
     else{
         while(p!=NULL){
             if(strcmp(p->sym_name, sym_name) == 0){
@@ -75,33 +68,9 @@ TableEntry *search(char *sym_name){
             }   
             p = p->next_hash;
         }
+        //if(found != 0) printf("found!\n");
         Assert((p==NULL&&found==0)||(found!=0&&p!=NULL));
         return p;
-    }
-}
-
-int get_len(Type *var_type){
-    if(var_type->kind == BASIC){
-        return 4;
-    }
-    else if(var_type->kind == STRUCTURE){
-        FieldList *p = var_type->structure.member;
-        int len = 0;
-        while(p!=NULL){
-            int t = get_len(p->type);
-            len += t;
-            p = p->tail;
-        }
-        return len;
-    }
-    else if(var_type->kind == ARRAY){
-        // As struct member
-        int len = var_type->array.len * var_type->array.size;
-        return len;
-    }
-    else{
-        Assert(0);
-        return 0;
     }
 }
 
@@ -118,24 +87,19 @@ TableEntry *VarDec(struct Node *vardec, Type *var_type){
     t->is_struct_def = 0;
     int last = 1;
     Type *prev_type = NULL;
-    int prev_len = get_len(var_type);
     while(IS(p, "VarDec")){
         //p->token_name == "VarDec"[r]
-        Type *tmp_type = (Type *)malloc(sizeof(Type));
+    Type *tmp_type = (Type *)malloc(sizeof(Type));
         tmp_type->kind = ARRAY;
         tmp_type->array.size = p->next_sib->next_sib->int_value;
         //printf("arraysize: %d\n", tmp_type->array.size);
         if(last){
             tmp_type->array.elem = var_type;
-            tmp_type->array.len = prev_len;
             last = 0;
         }
         else{
             tmp_type->array.elem = prev_type;
-            tmp_type->array.len = prev_len;
         }
-        //printf("arraylen: %d\n", tmp_type->array.len);
-        prev_len = tmp_type->array.size * prev_len;
         prev_type = tmp_type;
         p = p->first_child;
     }
@@ -151,7 +115,7 @@ TableEntry *VarDec(struct Node *vardec, Type *var_type){
 FieldList *struct_DecList(Type* def_type, struct Node *declist, FieldList *struct_last, int initial, Type *struct_type){
     /*
         DecList : Dec | Dec COMMA DecList 
-        Dec : VarDec | VarDec ASSIGNOP EXP (Err 15)
+        Dec : VarDec | VarDec ASSIGNOP EXP
     */
     Assert(IS(declist, "DecList"));
     int first=1;
@@ -169,24 +133,11 @@ FieldList *struct_DecList(Type* def_type, struct Node *declist, FieldList *struc
             printf("Error type 15 at Line %d: Redefined field \"%s\".\n",declist->first_child->first_child->first_line, vardec_tmp->sym_name);
             continue;
         }
-        else{
+        else 
             insert(vardec_tmp);
-            log("vardec_tmp: %s\n", vardec_tmp->sym_name);
-            // lab3
-            StructTableEntry *struct_symbol = (StructTableEntry *)malloc(sizeof(StructTableEntry));
-            struct_symbol->sym_name = (char *)malloc(strlen(vardec_tmp->sym_name)+1);
-            strcpy(struct_symbol->sym_name, vardec_tmp->sym_name);
-            struct_symbol->offset = 0;
-            struct_symbol->next_hash = NULL;
-            struct_symbol->sym_type = vardec_tmp->sym_type;
-            insert_struct_symbol_table(struct_symbol);
-            // lab3
-        }
         FieldList *new_component = (FieldList *)malloc(sizeof(FieldList));
         
         new_component->type = vardec_tmp->sym_type;
-        new_component->field_size = get_len(vardec_tmp->sym_type);
-        //log("component: %s size: %d\n", vardec_tmp->sym_name, new_component->field_size);
         new_component->name = vardec_tmp->sym_name;
         new_component->tail = NULL;
         if(initial){
@@ -258,9 +209,7 @@ Type* Specifier(struct Node* spec){ // as a child: A -> Specifier ...
                     printf("Error type 16 at Line %d: Duplicated name \"%s\".\n", spec->first_line, struct_def->sym_name);
                     free(struct_def);
                 }
-                else {
-                    insert(struct_def);
-                }
+                else insert(struct_def);
             }
             else{
                 Assert(opttag->first_child == NULL);
@@ -292,17 +241,13 @@ Type* Specifier(struct Node* spec){ // as a child: A -> Specifier ...
             depth--;
             type->structure.is_defined = 1;
             struct_def->sym_type = type;
-            // lab3
-            fill_in_offset(type);
-            //log("total size : %d\n", total_size);
-            // lab3
-            
-            // FieldList *t = type->structure.member;
+            FieldList *t = type->structure.member;
             // while(t!=NULL){
             //     printf("%s->", t->name);
             //     t = t->tail;
             // }
             // printf("\n");
+            
         }
     }
     return type;
@@ -329,12 +274,7 @@ TableEntry *FunDec(struct Node *fundec, Type *fun_type){
     t->sym_type->func.param_cnt = 0;
     t->sym_type->func.first_line = fundec->first_line;
     struct Node *varlist = fundec->first_child->next_sib->next_sib;
-    if(strcmp(varlist->token_name, "VarList")!=0) {
-        // begin{lab3}
-        translate_FuncDec(fundec);
-        // end{lab3}
-        return t;
-    }
+    if(strcmp(varlist->token_name, "VarList")!=0) return t;
     /*
         VarList : ParamDec COMMA VarList | ParamDec
         ParamDec : Specifier VarDec
@@ -371,11 +311,8 @@ TableEntry *FunDec(struct Node *fundec, Type *fun_type){
             para_last = para_last->tail;
         }
     }while(varlist->first_child->next_sib!=NULL);
-    // delete(depth); lab2 comment: save till CompSt
+    // delete(depth); save till CompSt
     depth--;
-    // begin{lab3}
-    translate_FuncDec(fundec);
-    // end{lab3}
     return t;
 }
 
@@ -519,7 +456,7 @@ Type *Exp(struct Node* exp){
             Type *array_type = Exp(array);
             Type *index_type = Exp(index);
             if(array_type == NULL) return NULL; // handling Errors
-            else{ 
+            else{ //TODO : how to get a more specified info?
                 if(array_type->kind!=ARRAY){
                     printf("Error type 10 at Line %d: Variable is not an array.\n", exp->first_line);
                     return NULL;
@@ -721,11 +658,8 @@ void CompSt(struct Node *com, Type* func_type){
         Stmt(stmtlist->first_child, func_type);
         stmtlist = stmtlist->first_child->next_sib;
     }
-    //begin{lab3}
-    translate_CompSt(com);
-    //end{lab3}
-    delete(depth);
-    depth--;
+   delete(depth);
+   depth--;
 }
 
 
@@ -815,18 +749,6 @@ void ExtDef(struct Node* node){
             Assert(IS(compst, "SEMI"));  
             delete(depth+1);
         }
-        // lab3
-        // Stiching:
-        if(compst->comp_tail==NULL && compst->comp_head==NULL){
-            log("skipping empty CompSt\n");
-            return;
-        }
-        Assert(compst->comp_tail!=NULL && compst->comp_head!=NULL);
-        compst->comp_head->prev = tail;
-        tail->next = compst->comp_head;
-        tail = compst->comp_tail;
-        Assert(tail->next==NULL);
-        // lab3
     }
     else{
         Assert(IS(p, "ExtDecList"));
@@ -873,52 +795,7 @@ void check_undefined_func(){
         p = p->next_stack;
     }
 }
-// lab3
-void add_read_write_function(){
-    TableEntry *read = (TableEntry *) malloc(sizeof(TableEntry));
-    TableEntry *write = (TableEntry *) malloc(sizeof(TableEntry));
-    Type *read_type = (Type *)malloc(sizeof(Type));
-    Type *write_type = (Type *)malloc(sizeof(Type));
-    Type *int_type = (Type *)malloc(sizeof(Type));
-    int_type->kind = BASIC;
-    int_type->basic = TYPE_INT;
-    read->sym_depth = 0;
-    read->sym_name = (char *)malloc(6*sizeof(char));
-    strcpy(read->sym_name, "read");
-    read->ir_var_no = NULL;
-    read->next_hash = NULL;
-    read->next_stack = NULL;
-    read->is_struct_def = 0;
-    read_type->kind = FUNCTION;
-    read_type->func.first_line = 0;
-    read_type->func.is_defined = 1;
-    read_type->func.param = NULL;
-    read_type->func.param_cnt = 0;
-    read_type->func.return_type = int_type;
-    read->sym_type = read_type;
-    write->sym_depth = 0;
-    write->sym_name = (char *)malloc(7*sizeof(char));
-    strcpy(write->sym_name, "write");
-    write->ir_var_no = NULL;
-    write->next_hash = NULL;
-    write->next_stack = NULL;
-    write->is_struct_def = 0;
-    write_type->kind = FUNCTION;
-    write_type->func.first_line = 0;
-    write_type->func.is_defined = 1;
-    FieldList *write_param = (FieldList *)malloc(sizeof(FieldList));
-    write_param->tail = NULL;
-    write_param->name = (char *)malloc(5*sizeof(char));
-    strcpy(write_param->name, "wrt");
-    write_param->type = int_type;
-    write_type->func.param = write_param;
-    write_type->func.param_cnt = 1;
-    write_type->func.return_type = int_type;
-    write->sym_type = write_type;
-    insert(write);
-    insert(read);
-} 
-// lab3
+
 void show_table(){
     printf("================================================\n");
     for(int i =0; i< TABLESIZE; i++){
@@ -939,7 +816,7 @@ void show_table(){
                     printf(" return type: %d, para_cnt: %d", p->sym_type->func.return_type->basic, p->sym_type->func.param_cnt);
                     FieldList *t = p->sym_type->func.param;
                     while(t!=NULL){
-                        printf(" %s(%d)", t->name, t->type->kind);
+                        printf("%s(%d)", t->name, t->type->kind);
                         t = t->tail;
                     }
                 }

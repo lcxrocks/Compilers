@@ -1,5 +1,5 @@
 #include<stdio.h>
-#include "common.h"
+#include"syntax.tab.h"
 
 int yylex();
 int yyrestart();
@@ -9,8 +9,11 @@ extern int yylineno;
 extern int prod_err;
 extern int handled_err;
 extern int token_err;
-extern InterCodes *head;
-
+void print_tree(struct Node* cur, int depth);
+int yyparse_wrap();
+void parsing(struct Node* root);
+void show_table();
+void check_undefined_func();
 //#define YYABORT // yyparse() immediately returns after syntax error 
 
 #ifdef YYDEBUG
@@ -27,18 +30,6 @@ int main(int argc, char** argv){
         perror(argv[1]);
         return 1;
     }
-    FILE *fp = NULL;
-    
-    #ifdef NDEBUG 
-    if((fp = fopen(argv[2], "w+"))==NULL){
-        perror(argv[2]);
-        return 1;
-    }
-    #endif
-
-    #ifndef NDEBUG
-        fp = fopen("out.ir", "a+");
-    #endif
     // #ifdef YYDEBUG
     //     yydebug = 1;
     // #endif
@@ -47,13 +38,8 @@ int main(int argc, char** argv){
     if(handled_err<prod_err) 
         fprintf(stderr, "Error type B at Line %d: Mysterious syntax error.\n", yylineno);
     if((prod_err+token_err)==0)
-        add_read_write_function();
-        parsing(root, 0);
+        parsing(root);
+    //show_table();
     check_undefined_func();
-    
-    // show_table();
-    // show_struct_symbol_table();
-    print_ir(fp, head);
-    fclose(fp);
     return 0;
 }

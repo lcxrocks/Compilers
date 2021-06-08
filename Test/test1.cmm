@@ -1,14 +1,14 @@
-struct Point {
-  int x;
-  int y;
-};
+int func()
+{
+  int i = 10;
+  return i;
+}
 
-int main(){
-  int a[3];
-  int b[4][5];
-  int c[2][3][5];
-  struct Point d[2][3];
-
-  a[3] = 3;
-  b[4][5] = 10;
+int main()
+{
+  int i = 0;
+  float j = 1.2;
+  i 
+   = 
+    j;
 }
