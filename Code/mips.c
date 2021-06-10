@@ -71,7 +71,7 @@ void init_memory(FILE* fp, InterCodes *start){
 
 void init_mips(FILE* fp, InterCodes *start){
     fprintf(fp, ".data\n");
-    // init_memory(fp, start);
+    init_memory(fp, start);
     fprintf(fp, "_prompt: .asciiz \"Enter an integer:\"\n");
     fprintf(fp, "_ret: .asciiz \"\\n\"\n");
     fprintf(fp, ".global main\n");
@@ -84,58 +84,35 @@ void reg(Operand *x, int reg_no){ // no: {0, 1, 2, 3}
 
 }
 
-void push_temps(FILE* fp){ // including v/t
-
-}
-
-void translate_ir(){
-
-}
-
-
-
 void print_mips(FILE* fp, InterCodes *start){
     init_mips(fp, start);
     InterCodes *p = start;
-    while(p!=NULL){
-        InterCode *ir = p->code;
-        if(ir->ir_kind == IR_FUNCTION){
-            translate_mips(fp, p);
-        }
-        switch (ir->ir_kind)
-        {
-        case IR_LABEL:
-            fprintf(fp, "label%d:", ir->unop.op->label_no);
-            break;
-        case IR_FUNCTION: 
-            // many detail
-            if(strcmp(ir->unop.op->func_name, "main")==0){
-                // dont have PARAM
-                // 1. push ret_addr
-                // 2. push $fp
-                // 3. push every temporary
-                // 4. 
-                
-
-            }
-            else{
-                // including PARAM
-                
-            }
-            break;
-        case IR_ASSIGN: // not used currently
-            if(ir->lr.op2->op_kind == OP_CONSTANT){
-                fprintf(fp, "li %s, %d", reg(ir->lr.op1, 0), ir->lr.op2->const_value);
-            }
-            else{
-                fprintf(fp, "move %s, %s", reg(ir->lr.op1, 0), reg(ir->lr.op2, 1));
-            }
-            break;
-        default:
-            break;
-        }
-        fprintf(fp, "\n");
-        p = p->next;
-    }
+    // while(p!=NULL){
+    //     InterCode *ir = p->code;
+    //     if(ir->ir_kind == IR_FUNCTION){
+    //         translate_mips(fp, p);
+    //     }
+    //     switch (ir->ir_kind)
+    //     {
+    //     case IR_LABEL:
+    //         fprintf(fp, "label%d:", ir->unop.op->label_no);
+    //         break;
+    //     case IR_FUNCTION: 
+    //         // many detail
+    //         break;
+    //     case IR_ASSIGN: // not used currently
+    //         if(ir->lr.op2->op_kind == OP_CONSTANT){
+    //             fprintf(fp, "li %s, %d", reg(ir->lr.op1, 0), ir->lr.op2->const_value);
+    //         }
+    //         else{
+    //             fprintf(fp, "move %s, %s", reg(ir->lr.op1, 0), reg(ir->lr.op2, 1));
+    //         }
+    //         break;
+    //     default:
+    //         break;
+    //     }
+    //     fprintf(fp, "\n");
+    //     p = p->next;
+    // }
 }
 
