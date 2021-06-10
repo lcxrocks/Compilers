@@ -3,9 +3,9 @@ extern InterCodes *head;
 
 void init_read(FILE* fp){
     fprintf(fp, "read:\n");
-    fprintf(fp, "\tli $a0, _prompt\n");
+    fprintf(fp, "\t\tli $a0, _prompt\n");
     fprintf(fp, "\tsyscall\n");
-    fprintf(fp, "\tli $v0, 5\n");
+    fprintf(fp, "\t\tli $v0, 5\n");
     fprintf(fp, "\tsyscall\n");
     fprintf(fp, "\tjr $ra\n");
     fprintf(fp, "\n");
@@ -13,12 +13,12 @@ void init_read(FILE* fp){
 
 void init_write(FILE* fp){
     fprintf(fp, "write:\n");
-    fprintf(fp, "\tli $v0, 1\n");
+    fprintf(fp, "\t\tli $v0, 1\n");
     fprintf(fp, "\tsyscall\n");
-    fprintf(fp, "\tli $v0, 4\n");
+    fprintf(fp, "\t\tli $v0, 4\n");
     fprintf(fp, "\tla $a0, _ret\n");
     fprintf(fp, "\tsyscall\n");
-    fprintf(fp, "\tmove $v0, $0\n");
+    fprintf(fp, "\t\tmove $v0, $0\n");
     fprintf(fp, "\tjr $ra\n");
     fprintf(fp, "\n");
 }
@@ -65,59 +65,64 @@ void init_mips(FILE* fp, InterCodes *start){
 }
 
 void reg(FILE* fp, Operand *x, int reg_no){ // no: {0, 1, 2, 3}
-    Assert(x->op_kind == OP_TEMP || x->op_kind == OP_VARIABLE);
-    if(x->op_kind == OP_TEMP){
-        fprintf(fp, "lw $t%d, t%d\n", reg_no, x->tmp_no);
+    if(x->op_kind == OP_TEMP || x->op_kind == OP_ADDRESS){
+        fprintf(fp, "\tlw $t%d, t%d\n", reg_no, x->tmp_no);
+    }
+    else if(x->op_kind == OP_VARIABLE){
+        fprintf(fp, "\tlw $t%d, v%d\n", reg_no, x->var_no);
     }
     else{
-        fprintf(fp, "lw $t%d, v%d\n", reg_no, x->var_no);
+        Assert(x->op_kind == OP_CONSTANT);
+        fprintf(fp, "\tli $t%d, %d\n", reg_no, x->const_value);
     }
 }
 
 void spill(FILE* fp, Operand *x, int reg_no){
-    Assert(x->op_kind == OP_TEMP || x->op_kind == OP_VARIABLE);
-    if(x->op_kind == OP_TEMP){
-        fprintf(fp, "sw $t%d, t%d\n", reg_no, x->tmp_no);
+    Assert(x->op_kind == OP_TEMP || x->op_kind == OP_VARIABLE  || x->op_kind == OP_ADDRESS);
+    if(x->op_kind == OP_TEMP || x->op_kind == OP_ADDRESS){
+        fprintf(fp, "\tsw $t%d, t%d\n", reg_no, x->tmp_no);
     }
     else{
-        fprintf(fp, "sw $t%d, v%d\n", reg_no, x->var_no);
+        fprintf(fp, "\tsw $t%d, v%d\n", reg_no, x->var_no);
     }
 }
 
 void print_arith(FILE* fp, InterCode *ir){
     reg(fp, ir->binop.result, 0);
-    if(ir->binop.op1->op_kind == OP_CONSTANT){
-        fprintf(fp, "li $t1, %d\n", ir->binop.op1->const_value);
-        if(ir->binop.op2->op_kind == OP_CONSTANT){
-            fprintf(fp, "li $t2, %d\n", ir->binop.op2->const_value);
-        }
-        else{
-            reg(fp, ir->binop.op2, 2);
-        }
-    }
-    else{
-        reg(fp, ir->binop.op1, 1);
-        if(ir->binop.op2->op_kind == OP_CONSTANT){
-            fprintf(fp, "li $t2, %d\n", ir->binop.op2->const_value);
-        }
-        else{
-            reg(fp, ir->binop.op2, 2);
-        }
-    }
+    reg(fp, ir->binop.op1, 1);
+    reg(fp, ir->binop.op2, 2);
+    // if(ir->binop.op1->op_kind == OP_CONSTANT){
+    //     fprintf(fp, "\tli $t1, %d\n", ir->binop.op1->const_value);
+    //     if(ir->binop.op2->op_kind == OP_CONSTANT){
+    //         fprintf(fp, "\tli $t2, %d\n", ir->binop.op2->const_value);
+    //     }
+    //     else{
+    //         reg(fp, ir->binop.op2, 2);
+    //     }
+    // }
+    // else{
+    //     reg(fp, ir->binop.op1, 1);
+    //     if(ir->binop.op2->op_kind == OP_CONSTANT){
+    //         fprintf(fp, "\tli $t2, %d\n", ir->binop.op2->const_value);
+    //     }
+    //     else{
+    //         reg(fp, ir->binop.op2, 2);
+    //     }
+    // }
     switch (ir->ir_kind)
     {
     case IR_ADD:
-        fprintf(fp, "add $t0, $t1, $t2\n");
+        fprintf(fp, "\tadd $t0, $t1, $t2\n");
         break;
     case IR_SUB:
-        fprintf(fp, "sub $t0, $t1, $t2\n");
+        fprintf(fp, "\tsub $t0, $t1, $t2\n");
         break;
     case IR_DIV: 
-        fprintf(fp, "div $t1, $t2\n");
-        fprintf(fp, "mflo $t0\n");
+        fprintf(fp, "\tdiv $t1, $t2\n");
+        fprintf(fp, "\tmflo $t0\n");
         break;
     case IR_MUL:
-        fprintf(fp, "mul $t1, $t2, $t3\n");
+        fprintf(fp, "\tmul $t1, $t2, $t3\n");
         break;
     default:
         break;
@@ -135,19 +140,16 @@ void print_mips(FILE* fp, InterCodes *start){
         case IR_LABEL:
             fprintf(fp, "label%d:\n", ir->unop.op->label_no);
             break;
-        case IR_FUNCTION: 
-            // many detail 
-            break;
         case IR_ASSIGN: // not used currently
             if(ir->lr.op2->op_kind == OP_CONSTANT){
                 reg(fp, ir->lr.op1, 0);
-                fprintf(fp, "li t%d, %d\n", 0, ir->lr.op2->const_value);
+                fprintf(fp, "\tli t%d, %d\n", 0, ir->lr.op2->const_value);
                 spill(fp, ir->lr.op1, 0);
             }
             else{
                 reg(fp, ir->lr.op1, 0);
                 reg(fp, ir->lr.op2, 1);
-                fprintf(fp, "move t%d, t%d\n", 0, 1);
+                fprintf(fp, "\tmove t%d, t%d\n", 0, 1);
                 spill(fp, ir->lr.op1, 0);
             }
             break;
@@ -160,45 +162,81 @@ void print_mips(FILE* fp, InterCodes *start){
         case IR_GET_ADDR: // basically IR_ASSIGN
             reg(fp, ir->lr.op1, 0);
             reg(fp, ir->lr.op2, 1);
-            fprintf(fp, "move t%d, t%d\n", 0, 1);
+            fprintf(fp, "\tmove t%d, t%d\n", 0, 1);
             spill(fp, ir->lr.op1, 0);
             break;
         case IR_GET_ADDR_VAL:
             reg(fp, ir->lr.op1, 0);
             reg(fp, ir->lr.op2, 1);
-            fprintf(fp, "lw $t0, 0($t1)\n");
+            fprintf(fp, "\tlw $t0, 0($t1)\n");
             spill(fp, ir->lr.op1, 0);
             break;
         case IR_TO_ADDR:
             reg(fp, ir->lr.op1, 0);
             reg(fp, ir->lr.op2, 1);
-            fprintf(fp, "sw $t1, 0($t0)\n");
+            fprintf(fp, "\tsw $t1, 0($t0)\n");
             // WARNING: dont need spill
             break;
         case IR_GOTO:
-            fprintf(fp, "j label%d\n", ir->unop.op->label_no);
+            fprintf(fp, "\tj label%d\n", ir->unop.op->label_no);
+            break;
+        case IR_IF:
+            reg(fp, ir->cond.op1, 0);
+            reg(fp, ir->cond.op2, 1);
+            if(strcmp(ir->cond.relop->relop, "==")==0){
+                fprintf(fp, "\tbeq $t0, $t1, label%d\n", ir->cond.op3->label_no);
+            }
+            else if(strcmp(ir->cond.relop->relop, "!=")==0){
+                fprintf(fp, "\tbne $t0, $t1, label%d\n", ir->cond.op3->label_no);
+            }
+            else if(strcmp(ir->cond.relop->relop, ">")==0){
+                fprintf(fp, "\tbgt $t0, $t1, label%d\n", ir->cond.op3->label_no);
+            }
+            else if(strcmp(ir->cond.relop->relop, "<")==0){
+                fprintf(fp, "\tblt $t0, $t1, label%d\n", ir->cond.op3->label_no);
+            }
+            else if(strcmp(ir->cond.relop->relop, ">=")==0){
+                fprintf(fp, "\tbge $t0, $t1, label%d\n", ir->cond.op3->label_no);
+            }
+            else if(strcmp(ir->cond.relop->relop, "<=")==0){
+                fprintf(fp, "\tble $t0, $t1, label%d\n", ir->cond.op3->label_no);
+            }
+            break;
+
+        case IR_READ:
+            
+            break;
+        case IR_WRITE: 
+
+            break;
+        case IR_DEC:
+            // array
+            fprintf(fp, "sw $sp, v%d\n", ir->lr.op1->var_no);
+            fprintf(fp, "addi $sp, $sp, -%d\n", ir->lr.op2->const_value);
+            break;
+        case IR_FUNCTION: 
+            // many detail 
+            fprintf(fp, "%s:\n", ir->unop.op->func_name);
+
             break;
         case IR_CALL_FUNC:
             //need more details: ARGS
             log("print_mips: IR_CALL_FUNC need more details\n");
-            fprintf(fp, "jal %s\n", ir->lr.op2->func_name);
+            fprintf(fp, "\tjal %s\n", ir->lr.op2->func_name);
             reg(fp, ir->lr.op1, 0);
-            fprintf(fp, "move $t0, $v0\n");
+            fprintf(fp, "\tmove $t0, $v0\n");
             spill(fp, ir->lr.op1, 0);
             break;
         case IR_RETURN:
-            if(ir->unop.op->op_kind==OP_CONSTANT){
-                fprintf(fp, "li $t0, %d\n", );
-            }
-            else{
-                reg(fp, ir->unop.op, 0);
-            }
-            fprintf(fp, "move $v0, ");
-
+            reg(fp, ir->unop.op, 0);
+            fprintf(fp, "\tmove $v0, $t0\n");
+            fprintf(fp, "\tjr $ra\n");
+            break;
+        
+        
         default:
             break;
         }
-        fprintf(fp, "\n");
         p = p->next;
     }
 }
