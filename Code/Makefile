@@ -44,7 +44,9 @@ lexical-d: $(LFILE)
 # 定义的一些伪目标
 .PHONY: clean tst
 tst:
-	if [ -e  out.ir ]; then rm out.ir; fi && ./parser ../Test/test1.cmm
+	if [ -e  out.ir ]; then rm out.ir; fi
+	if [ -e  out.s ]; then rm out.s; fi
+	./parser ../Test/test1.cmm
 clean:
 	rm -f parser lex.yy.c syntax.tab.c syntax.tab.h syntax.output
 	rm -f $(OBJS) $(OBJS:.o=.d)

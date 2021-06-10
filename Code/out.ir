@@ -1,102 +1,90 @@
-FUNCTION fact :
-PARAM v1
-IF v1 <= #0 GOTO label1
-GOTO label2
-LABEL label1 :
-RETURN #1
-GOTO label3
-LABEL label2 :
-t3 := v1 - #1
-ARG t3
-t2 := CALL fact
-t1 := t2 * v1
-RETURN t1
-LABEL label3 :
-FUNCTION isqrt :
-PARAM v2
-v3 := #0
-LABEL label7 :
-IF v3 < v2 GOTO label8
-GOTO label9
-LABEL label8 :
-t4 := v3 * v3
-IF t4 <= v2 GOTO label6
-GOTO label5
-LABEL label6 :
-t6 := v3 + #1
-t7 := v3 + #1
-t5 := t6 * t7
-IF t5 > v2 GOTO label4
-GOTO label5
-LABEL label4 :
-RETURN v3
-LABEL label5 :
-t8 := v3 + #1
-v3 := t8
-GOTO label7
-LABEL label9 :
-t9 := #0 - #1
-RETURN t9
 FUNCTION mod :
+PARAM v1
+PARAM v2
+t3 := v1 / v2
+t2 := t3 * v2
+t1 := v1 - t2
+RETURN t1
+FUNCTION quick_power_mod :
+PARAM v3
 PARAM v4
 PARAM v5
-IF v4 < #0 GOTO label10
-GOTO label13
-LABEL label13 :
-IF v5 <= #0 GOTO label10
-GOTO label11
+v6 := #1
+IF v3 <= #0 GOTO label6
+GOTO label10
 LABEL label10 :
-t10 := #0 - #1
-RETURN t10
-GOTO label12
-LABEL label11 :
-t13 := v4 / v5
-t12 := t13 * v5
-t11 := v4 - t12
-RETURN t11
-LABEL label12 :
-FUNCTION is_prime :
-PARAM v6
-v7 := #2
-ARG v6
-t16 := CALL isqrt
-v8 := t16
-LABEL label16 :
-IF v7 <= v8 GOTO label17
-GOTO label18
-LABEL label17 :
-ARG v7
-ARG v6
-t14 := CALL mod
-IF t14 == #0 GOTO label14
-GOTO label15
-LABEL label14 :
-RETURN #0
-LABEL label15 :
-t15 := v7 + #1
-v7 := t15
-GOTO label16
-LABEL label18 :
-RETURN #1
+IF v4 <= #0 GOTO label6
+GOTO label9
+LABEL label9 :
+IF v5 <= #0 GOTO label6
+GOTO label7
+LABEL label6 :
+t4 := #0 - #1
+RETURN t4
+GOTO label8
+LABEL label7 :
+ARG v5
+ARG v3
+t11 := CALL mod
+v3 := t11
+LABEL label3 :
+IF v4 != #0 GOTO label4
+GOTO label5
+LABEL label4 :
+ARG #2
+ARG v4
+t7 := CALL mod
+IF t7 == #1 GOTO label1
+GOTO label2
+LABEL label1 :
+t6 := v6 * v3
+ARG v5
+ARG t6
+t5 := CALL mod
+v6 := t5
+LABEL label2 :
+t8 := v4 / #2
+v4 := t8
+t10 := v3 * v3
+ARG v5
+ARG t10
+t9 := CALL mod
+v3 := t9
+GOTO label3
+LABEL label5 :
+RETURN v6
+LABEL label8 :
 FUNCTION main :
-v9 := #2
-READ t19
-v10 := t19
-LABEL label21 :
-ARG v10
-t20 := CALL fact
-IF v9 < t20 GOTO label22
-GOTO label23
-LABEL label22 :
-ARG v9
-t17 := CALL is_prime
-IF t17 != #0 GOTO label19
-GOTO label20
-LABEL label19 :
-WRITE v9
-LABEL label20 :
-t18 := v9 + #1
-v9 := t18
-GOTO label21
-LABEL label23 :
+DEC v8 12
+v7 := #0
+LABEL label11 :
+IF v7 < #3 GOTO label12
+GOTO label13
+LABEL label12 :
+READ t12
+t14 := &v8
+t15 := v7 * #4
+t13 := t14 + t15
+*t13 := t12
+t16 := v7 + #1
+v7 := t16
+GOTO label11
+LABEL label13 :
+t19 := &v8
+t20 := #0 * #4
+t18 := t19 + t20
+t21 := *t18
+t23 := &v8
+t24 := #1 * #4
+t22 := t23 + t24
+t25 := *t22
+t27 := &v8
+t28 := #2 * #4
+t26 := t27 + t28
+t29 := *t26
+ARG t29
+ARG t25
+ARG t21
+t17 := CALL quick_power_mod
+WRITE t17
 RETURN #0

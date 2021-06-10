@@ -37,6 +37,7 @@ int main(int argc, char** argv){
     #endif
 
     #ifndef NDEBUG
+        FILE *ref = fopen("out.ir", "a+");
         fp = fopen("out.s", "a+");
     #endif
     // #ifdef YYDEBUG
@@ -53,6 +54,9 @@ int main(int argc, char** argv){
     
     // show_table();
     // show_struct_symbol_table();
+    #ifndef NDEBUG
+    print_ir(ref, head);
+    #endif
     print_mips(fp, head);
     fclose(fp);
     return 0;

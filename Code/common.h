@@ -141,17 +141,17 @@ struct ArgList_ {
 };
 
 // Lab4
-struct RecordEntry_ {
-    enum { R_VAR, R_TEMP } data_kind;
-    int no;
-    int offset;
-    RecordEntry* next;
-};
+// struct RecordEntry_ {
+//     enum { R_VAR, R_TEMP } data_kind;
+//     int no;
+//     int offset;
+//     RecordEntry* next;
+// };
 
-struct FuncRecord_{
-    RecordEntry* act_record;
-    FuncRecord* next;
-};
+// struct FuncRecord_{
+//     RecordEntry* act_record;
+//     FuncRecord* next;
+// };
 
 #define printk printf
 
