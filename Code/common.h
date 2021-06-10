@@ -21,7 +21,8 @@ typedef struct Operand_ Operand;
 typedef struct InterCodes_ InterCodes;
 typedef struct ArgList_ ArgList;
 typedef struct StructTableEntry_ StructTableEntry;
-
+typedef struct RecordEntry_ RecordEntry;
+typedef struct FuncRecord_ FuncRecord;
 
 // Lab1
 struct Node {
@@ -139,10 +140,23 @@ struct ArgList_ {
     ArgList* next;
 };
 
+// Lab4
+struct RecordEntry_ {
+    enum { R_VAR, R_TEMP } data_kind;
+    int no;
+    int offset;
+    RecordEntry* next;
+};
+
+struct FuncRecord_{
+    RecordEntry* act_record;
+    FuncRecord* next;
+};
+
 #define printk printf
 
 // assert.h
-#define NDEBUG
+//#define NDEBUG
 
 #ifdef NDEBUG
   #define Assert(cond) 1
@@ -189,4 +203,6 @@ StructTableEntry* search_struct_symbol_table(char* sym_name);
 void show_struct_symbol_table();
 void fill_in_offset(Type *struct_def);
 
+// Lab4
+void print_mips(FILE *fp, InterCodes *start);
 #endif

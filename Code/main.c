@@ -37,7 +37,7 @@ int main(int argc, char** argv){
     #endif
 
     #ifndef NDEBUG
-        fp = fopen("out.ir", "a+");
+        fp = fopen("out.s", "a+");
     #endif
     // #ifdef YYDEBUG
     //     yydebug = 1;
@@ -53,7 +53,7 @@ int main(int argc, char** argv){
     
     // show_table();
     // show_struct_symbol_table();
-    print_ir(fp, head);
+    print_mips(fp, head);
     fclose(fp);
     return 0;
 }
