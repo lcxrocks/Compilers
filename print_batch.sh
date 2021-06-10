@@ -1,11 +1,11 @@
 #!/bin/bash
-for file in compilers-tests-L3/Tests_normal/tests/*
+for file in Test/Tests_normal/tests/*
 do
     if test -f $file
     then
         echo $file 是文件
         rm $file.out 
-        ./parser $file $file.ir
+        ./parser $file $file.s
     fi
     if test -d $file
     then
