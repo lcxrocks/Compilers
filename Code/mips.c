@@ -100,7 +100,6 @@ void reg(FILE* fp, Operand *x, int reg_no){ // no: {0, 1, 2, 3}
 }
 
 void spill(FILE* fp, Operand *x, int reg_no){
-    log("x->op_kind: %d\n", x->op_kind);
     if(x->op_kind == OP_TEMP || x->op_kind == OP_ADDRESS){
         fprintf(fp, "\tsw $t%d, t%d\n", reg_no, x->tmp_no);
     }
@@ -114,13 +113,11 @@ void spill(FILE* fp, Operand *x, int reg_no){
 }
 
 void print_arith(FILE* fp, InterCode *ir){
-    // reg(fp, ir->binop.result, 0);
     reg(fp, ir->binop.op1, 1);
     reg(fp, ir->binop.op2, 2);
     switch (ir->ir_kind)
     {
     case IR_ADD:
-        log("should see you right?\n");
         fprintf(fp, "\tadd $t0, $t1, $t2\n");
         break;
     case IR_SUB:
@@ -252,7 +249,7 @@ void print_mips(FILE* fp, InterCodes *start){
             fprintf(fp, "\taddi $sp, $sp, -%d\n", ir->lr.op2->const_value);
             fprintf(fp, "\tsw $sp, v%d\n", ir->lr.op1->var_no);
             Assert(cur_function!=NULL);
-            cur_function->array_size = ir->lr.op2->const_value;
+            cur_function->array_size += ir->lr.op2->const_value;
             break;
         case IR_FUNCTION: 
             fprintf(fp, "\n");
@@ -267,7 +264,6 @@ void print_mips(FILE* fp, InterCodes *start){
             */
             FuncRecord* tmp = record_head;
             while(tmp!=NULL){
-                log("checking on %s (cur: %s)\n", tmp->func_name, ir->unop.op->func_name);
                 if(strcmp(ir->unop.op->func_name, tmp->func_name)==0) {
                     break;
                 }
@@ -355,6 +351,7 @@ void print_mips(FILE* fp, InterCodes *start){
             
             // 1. $sp + array_size
             if(cur_function->array_size!=0){
+                log("I should see this\n");
                 fprintf(fp, "\taddi $sp, $sp, %d\n", cur_function->array_size);
             }   
             // 2. pop args
