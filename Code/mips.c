@@ -146,10 +146,6 @@ void pop_ra(FILE* fp){
     fprintf(fp, "\taddi $sp, $sp, 4\n");
 }
 
-void save_param(FILE* fp){
-
-}
-
 void print_mips(FILE* fp, InterCodes *start){
     init_mips(fp, start);
     InterCodes *p = start;
@@ -348,13 +344,12 @@ void print_mips(FILE* fp, InterCodes *start){
             pop_ra(fp);
             break;
         case IR_RETURN:
-            
+            Assert(cur_function!=NULL);
             // 1. $sp + array_size
             if(cur_function->array_size!=0){
-                log("I should see this\n");
                 fprintf(fp, "\taddi $sp, $sp, %d\n", cur_function->array_size);
-            }   
-            // 2. pop args
+            }
+            // 2. pop args ------> should do this when next function starts
             ArgList* arg_tmp = cur_function->args;
             while(arg_tmp!=NULL){
                 fprintf(fp, "\tlw $t0, 0($sp)\n");
@@ -362,6 +357,7 @@ void print_mips(FILE* fp, InterCodes *start){
                 spill(fp, arg_tmp->arg, 0);
                 arg_tmp = arg_tmp->next;
             }
+            //cur_function = NULL;
             reg(fp, ir->unop.op, 0);
             fprintf(fp, "\tmove $v0, $t0\n");
             fprintf(fp, "\tjr $ra\n");

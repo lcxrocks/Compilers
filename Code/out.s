@@ -64,6 +64,8 @@ t45: .word 0
 t46: .word 0
 t47: .word 0
 t48: .word 0
+t49: .word 0
+t50: .word 0
 _prompt: .asciiz "Enter an integer:"
 _ret: .asciiz "\n"
 .globl main
@@ -87,67 +89,118 @@ write:
 	jr $ra
 
 lcx_bit_and:
-	lw $t0, 4($sp)
+	lw $t0, v1
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, v2
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, 12($sp)
 	sw $t0, v1
-	lw $t0, 8($sp)
+	lw $t0, 16($sp)
 	sw $t0, v2
 	lw $t0, v1
 	li $t1, 0
 	beq $t0, $t1, label1
 	j label2
 label1:
+	lw $t0, 0($sp)
+	sw $t0, v2
+	lw $t0, 0($sp)
+	sw $t0, v1
 	li $t0, 0
 	move $v0, $t0
 	jr $ra
 	j label3
 label2:
+	lw $t0, 0($sp)
+	sw $t0, v2
+	lw $t0, 0($sp)
+	sw $t0, v1
 	lw $t0, v2
 	move $v0, $t0
 	jr $ra
 label3:
+	addi $sp, $sp, 4
+	sw $t0, v2
+	addi $sp, $sp, 4
+	sw $t0, v1
 
 lcx_bit_or:
-	lw $t0, 4($sp)
+	lw $t0, v3
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, v4
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, 12($sp)
 	sw $t0, v3
-	lw $t0, 8($sp)
+	lw $t0, 16($sp)
 	sw $t0, v4
 	lw $t0, v3
 	li $t1, 0
 	beq $t0, $t1, label4
 	j label5
 label4:
+	lw $t0, 0($sp)
+	sw $t0, v4
+	lw $t0, 0($sp)
+	sw $t0, v3
 	lw $t0, v4
 	move $v0, $t0
 	jr $ra
 	j label6
 label5:
+	lw $t0, 0($sp)
+	sw $t0, v4
+	lw $t0, 0($sp)
+	sw $t0, v3
 	li $t0, 1
 	move $v0, $t0
 	jr $ra
 label6:
+	addi $sp, $sp, 4
+	sw $t0, v4
+	addi $sp, $sp, 4
+	sw $t0, v3
 
 lcx_bit_not:
-	lw $t0, 4($sp)
+	lw $t0, v5
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, 8($sp)
 	sw $t0, v5
 	lw $t0, v5
 	li $t1, 0
 	beq $t0, $t1, label7
 	j label8
 label7:
+	lw $t0, 0($sp)
+	sw $t0, v5
 	li $t0, 1
 	move $v0, $t0
 	jr $ra
 	j label9
 label8:
+	lw $t0, 0($sp)
+	sw $t0, v5
 	li $t0, 0
 	move $v0, $t0
 	jr $ra
 label9:
+	addi $sp, $sp, 4
+	sw $t0, v5
 
 lcx_mod:
-	lw $t0, 4($sp)
+	lw $t0, v6
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, v7
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, 12($sp)
 	sw $t0, v6
-	lw $t0, 8($sp)
+	lw $t0, 16($sp)
 	sw $t0, v7
 	lw $t1, v6
 	lw $t2, v7
@@ -162,14 +215,28 @@ lcx_mod:
 	lw $t2, t2
 	sub $t0, $t1, $t2
 	sw $t0, t1
+	lw $t0, 0($sp)
+	sw $t0, v7
+	lw $t0, 0($sp)
+	sw $t0, v6
 	lw $t0, t1
 	move $v0, $t0
 	jr $ra
+	addi $sp, $sp, 4
+	sw $t0, v7
+	addi $sp, $sp, 4
+	sw $t0, v6
 
 lcx_and:
-	lw $t0, 4($sp)
+	lw $t0, v8
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, v9
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, 12($sp)
 	sw $t0, v8
-	lw $t0, 8($sp)
+	lw $t0, 16($sp)
 	sw $t0, v9
 	li $t0, 32
 	sw $t0, v15
@@ -194,6 +261,10 @@ label12:
 	j label11
 label10:
 	addi $sp, $sp, 384
+	lw $t0, 0($sp)
+	sw $t0, v9
+	lw $t0, 0($sp)
+	sw $t0, v8
 	li $t0, 0
 	move $v0, $t0
 	jr $ra
@@ -421,11 +492,36 @@ label20:
 	lw $t0, t34
 	lw $t1, t25
 	sw $t1, 0($t0)
+	lw $t1, v13
+	move $t0, $t1
+	sw $t0, t38
 	lw $t1, v10
-	li $t2, 1
+	li $t2, 4
+	mul $t0, $t1, $t2
+	sw $t0, t39
+	lw $t1, t38
+	lw $t2, t39
 	add $t0, $t1, $t2
 	sw $t0, t37
 	lw $t1, t37
+	lw $t0, 0($t1)
+	sw $t0, t40
+	lw $t0, t40
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	move $a0, $t0
+	jal write
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	lw $t1, v10
+	li $t2, 1
+	add $t0, $t1, $t2
+	sw $t0, t41
+	lw $t1, t41
 	move $t0, $t1
 	sw $t0, v10
 	j label19
@@ -433,8 +529,8 @@ label21:
 	lw $t1, v15
 	li $t2, 1
 	sub $t0, $t1, $t2
-	sw $t0, t45
-	lw $t1, t45
+	sw $t0, t49
+	lw $t1, t49
 	move $t0, $t1
 	sw $t0, v10
 label22:
@@ -446,62 +542,54 @@ label23:
 	lw $t1, v14
 	li $t2, 2
 	mul $t0, $t1, $t2
-	sw $t0, t39
+	sw $t0, t43
 	lw $t1, v13
 	move $t0, $t1
-	sw $t0, t41
+	sw $t0, t45
 	lw $t1, v10
 	li $t2, 4
 	mul $t0, $t1, $t2
-	sw $t0, t42
-	lw $t1, t41
-	lw $t2, t42
+	sw $t0, t46
+	lw $t1, t45
+	lw $t2, t46
 	add $t0, $t1, $t2
-	sw $t0, t40
-	lw $t1, t40
+	sw $t0, t44
+	lw $t1, t44
 	lw $t0, 0($t1)
-	sw $t0, t43
-	lw $t1, t39
-	lw $t2, t43
+	sw $t0, t47
+	lw $t1, t43
+	lw $t2, t47
 	add $t0, $t1, $t2
-	sw $t0, t38
-	lw $t1, t38
+	sw $t0, t42
+	lw $t1, t42
 	move $t0, $t1
 	sw $t0, v14
 	lw $t1, v10
 	li $t2, 1
 	sub $t0, $t1, $t2
-	sw $t0, t44
-	lw $t1, t44
+	sw $t0, t48
+	lw $t1, t48
 	move $t0, $t1
 	sw $t0, v10
 	j label22
 label24:
 	addi $sp, $sp, 384
+	lw $t0, 0($sp)
+	sw $t0, v9
+	lw $t0, 0($sp)
+	sw $t0, v8
 	lw $t0, v14
 	move $v0, $t0
 	jr $ra
+	addi $sp, $sp, 4
+	sw $t0, v9
+	addi $sp, $sp, 4
+	sw $t0, v8
 
 main:
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	jal read
-	move $t0, $v0
-	sw $t0, t46
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	lw $t1, t46
-	move $t0, $t1
+	li $t0, 100
 	sw $t0, v16
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	jal read
-	move $t0, $v0
-	sw $t0, t47
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	lw $t1, t47
-	move $t0, $t1
+	li $t0, 111
 	sw $t0, v17
 	lw $t0, v17
 	addi $sp, $sp, -4
@@ -521,8 +609,8 @@ main:
 	addi $sp, $sp, 4
 	sw $t0, v17
 	move $t0, $v0
-	sw $t0, t48
-	lw $t0, t48
+	sw $t0, t50
+	lw $t0, t50
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4

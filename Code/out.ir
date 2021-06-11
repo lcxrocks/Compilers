@@ -121,35 +121,38 @@ t35 := &v13
 t36 := v10 * #4
 t34 := t35 + t36
 *t34 := t25
-t37 := v10 + #1
-v10 := t37
+t38 := &v13
+t39 := v10 * #4
+t37 := t38 + t39
+t40 := *t37
+WRITE t40
+t41 := v10 + #1
+v10 := t41
 GOTO label19
 LABEL label21 :
-t45 := v15 - #1
-v10 := t45
+t49 := v15 - #1
+v10 := t49
 LABEL label22 :
 IF v10 >= #0 GOTO label23
 GOTO label24
 LABEL label23 :
-t39 := v14 * #2
-t41 := &v13
-t42 := v10 * #4
-t40 := t41 + t42
-t43 := *t40
-t38 := t39 + t43
-v14 := t38
-t44 := v10 - #1
-v10 := t44
+t43 := v14 * #2
+t45 := &v13
+t46 := v10 * #4
+t44 := t45 + t46
+t47 := *t44
+t42 := t43 + t47
+v14 := t42
+t48 := v10 - #1
+v10 := t48
 GOTO label22
 LABEL label24 :
 RETURN v14
 FUNCTION main :
-READ t46
-v16 := t46
-READ t47
-v17 := t47
+v16 := #100
+v17 := #111
 ARG v17
 ARG v16
-t48 := CALL and
-WRITE t48
+t50 := CALL and
+WRITE t50
 RETURN #0
