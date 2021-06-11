@@ -79,12 +79,16 @@ void reg(FILE* fp, Operand *x, int reg_no){ // no: {0, 1, 2, 3}
 }
 
 void spill(FILE* fp, Operand *x, int reg_no){
-    Assert(x->op_kind == OP_TEMP || x->op_kind == OP_VARIABLE  || x->op_kind == OP_ADDRESS);
+    log("x->op_kind: %d\n", x->op_kind);
     if(x->op_kind == OP_TEMP || x->op_kind == OP_ADDRESS){
         fprintf(fp, "\tsw $t%d, t%d\n", reg_no, x->tmp_no);
     }
-    else{
+    else if(x->op_kind == OP_VARIABLE){
         fprintf(fp, "\tsw $t%d, v%d\n", reg_no, x->var_no);
+    }
+    else{
+        Assert(x->op_kind == OP_CONSTANT);
+        return;
     }
 }
 
@@ -95,6 +99,7 @@ void print_arith(FILE* fp, InterCode *ir){
     switch (ir->ir_kind)
     {
     case IR_ADD:
+        log("should see you right?\n");
         fprintf(fp, "\tadd $t0, $t1, $t2\n");
         break;
     case IR_SUB:
@@ -113,10 +118,23 @@ void print_arith(FILE* fp, InterCode *ir){
     spill(fp, ir->binop.result, 0);
 }
 
+void push_ra(FILE* fp){
+    fprintf(fp, "\taddi $sp, $sp, -4\n");
+    fprintf(fp, "\tsw $ra, 0($sp)\n");
+}
+
+void pop_ra(FILE* fp){
+    fprintf(fp, "\tlw $ra, 0($sp)\n");
+    fprintf(fp, "\taddi $sp, $sp, 4\n");
+}
+
 void print_mips(FILE* fp, InterCodes *start){
     init_mips(fp, start);
     InterCodes *p = start;
+    int cnt = 0;
     while(p!=NULL){
+        cnt++;
+        log("translating ir: %d\n", cnt);
         InterCode *ir = p->code;
         switch (ir->ir_kind)
         {
@@ -224,6 +242,7 @@ void print_mips(FILE* fp, InterCodes *start){
             InterCodes *param = p->next;
             int offset = 0;
             while(param->code->ir_kind == IR_PARAM){
+                cnt++;
                 offset += 4;
                 fprintf(fp, "\tlw $t0, %d($sp)\n", offset);
                 spill(fp, param->code->unop.op, 0);
@@ -238,6 +257,7 @@ void print_mips(FILE* fp, InterCodes *start){
             int arg_cnt = 0;
             Assert(arg->code->ir_kind == IR_ARG);
             while(arg->code->ir_kind == IR_ARG){
+                cnt++;
                 arg_cnt++;
                 reg(fp, arg->code->unop.op, 0);
                 fprintf(fp, "\taddi $sp, $sp, -4\n");
