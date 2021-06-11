@@ -205,24 +205,20 @@ void print_mips(FILE* fp, InterCodes *start){
             break;
 
         case IR_READ:
-            fprintf(fp, "\taddi $sp, $sp, -4\n");
-            fprintf(fp, "\tsw $ra, 0($sp)\n");
+            push_ra(fp);
             fprintf(fp, "\tjal read\n");
             fprintf(fp, "\tmove $t0, $v0\n");
-            fprintf(fp, "\tlw $ra, 0($sp)\n");
-            fprintf(fp, "\taddi $sp, $sp, 4\n");
             spill(fp, ir->unop.op, 0);
+            pop_ra(fp);
             break;
         case IR_WRITE: 
             reg(fp, ir->unop.op, 0);
             fprintf(fp, "\taddi $sp, $sp, -4\n");
             fprintf(fp, "\tsw $t0, 0($sp)\n");
-            fprintf(fp, "\taddi $sp, $sp, -4\n");
-            fprintf(fp, "\tsw $ra, 0($sp)\n");
+            push_ra(fp);
             fprintf(fp, "\tmove $a0, $t0\n");
             fprintf(fp, "\tjal write\n");
-            fprintf(fp, "\tlw $ra, 0($sp)\n");
-            fprintf(fp, "\taddi $sp, $sp, 4\n");
+            pop_ra(fp);
             fprintf(fp, "\tlw $t0, 0($sp)\n");
             fprintf(fp, "\taddi $sp, $sp, 4\n");
             break;
@@ -270,8 +266,7 @@ void print_mips(FILE* fp, InterCodes *start){
             Assert(p->code->ir_kind == IR_CALL_FUNC);
             arg = arg->prev;
             if(arg_cnt > 0) Assert(arg->code->ir_kind == IR_ARG); // first arg
-            fprintf(fp, "\taddi $sp, $sp, -4\n");
-            fprintf(fp, "\tsw $ra, 0($sp)\n");
+            push_ra(fp);
             if(strcmp(ir->lr.op2->func_name, "main")!=0){
                 fprintf(fp, "\tjal lcx_%s\n", ir->lr.op2->func_name);
             }  
@@ -281,8 +276,7 @@ void print_mips(FILE* fp, InterCodes *start){
             //reg(fp, ir->lr.op1, 0);
             fprintf(fp, "\tmove $t0, $v0\n");
             spill(fp, ir->lr.op1, 0);
-            fprintf(fp, "\tlw $ra, 0($sp)\n");
-            fprintf(fp, "\taddi $sp, $sp, 4\n");
+            pop_ra(fp);
             while(arg->code->ir_kind == IR_ARG){
                 arg_cnt--;
                 fprintf(fp, "\tlw $t0, 0($sp)\n");
