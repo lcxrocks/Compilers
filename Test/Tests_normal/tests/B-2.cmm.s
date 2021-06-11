@@ -86,12 +86,12 @@ write:
 main:
 	li $t0, 3
 	sw $t0, v8
-	sw $sp, v3
 	addi $sp, $sp, -12
+	sw $sp, v3
 	li $t0, 100
 	sw $t0, v4
-	sw $sp, v5
 	addi $sp, $sp, -404
+	sw $sp, v5
 	li $t0, 1
 	sw $t0, v1
 	li $t0, 0

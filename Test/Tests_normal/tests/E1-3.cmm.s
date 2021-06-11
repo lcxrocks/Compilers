@@ -111,7 +111,9 @@ write:
 	move $v0, $0
 	jr $ra
 
-cal_bmi:
+lcx_cal_bmi:
+	lw $t0, 4($sp)
+	sw $t0, v1
 	lw $t1, v1
 	move $t0, $t1
 	sw $t0, t3
@@ -165,7 +167,9 @@ cal_bmi:
 	move $v0, $t0
 	jr $ra
 
-cal_avg_bmi:
+lcx_cal_avg_bmi:
+	lw $t0, 4($sp)
+	sw $t0, v2
 	li $t0, 0
 	sw $t0, v3
 	li $t0, 0
@@ -191,14 +195,19 @@ label2:
 	lw $t2, t17
 	add $t0, $t1, $t2
 	sw $t0, t14
+	lw $t0, t14
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal cal_bmi
-	lw $t0, t18
+	jal lcx_cal_bmi
 	move $t0, $v0
 	sw $t0, t18
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, t14
 	lw $t1, v2
 	move $t0, $t1
 	sw $t0, t23
@@ -257,8 +266,8 @@ label3:
 	jr $ra
 
 main:
-	sw $sp, v7
 	addi $sp, $sp, -1040
+	sw $sp, v7
 	li $t0, 0
 	sw $t0, v5
 label7:
@@ -475,14 +484,19 @@ label6:
 	lw $t2, t75
 	add $t0, $t1, $t2
 	sw $t0, t73
+	lw $t0, t73
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal cal_avg_bmi
-	lw $t0, t76
+	jal lcx_cal_avg_bmi
 	move $t0, $v0
 	sw $t0, t76
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, t73
 	lw $t1, v5
 	li $t2, 1
 	add $t0, $t1, $t2

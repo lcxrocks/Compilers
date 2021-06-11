@@ -120,7 +120,9 @@ write:
 	move $v0, $0
 	jr $ra
 
-fact:
+lcx_fact:
+	lw $t0, 4($sp)
+	sw $t0, v1
 	lw $t0, v1
 	li $t1, 0
 	ble $t0, $t1, label1
@@ -135,14 +137,19 @@ label2:
 	li $t2, 1
 	sub $t0, $t1, $t2
 	sw $t0, t3
+	lw $t0, t3
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal fact
-	lw $t0, t2
+	jal lcx_fact
 	move $t0, $v0
 	sw $t0, t2
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, t3
 	lw $t1, v1
 	lw $t2, t2
 	mul $t0, $t1, $t2
@@ -152,7 +159,9 @@ label2:
 	jr $ra
 label3:
 
-isqrt:
+lcx_isqrt:
+	lw $t0, 4($sp)
+	sw $t0, v2
 	li $t0, 0
 	sw $t0, v3
 label7:
@@ -208,7 +217,11 @@ label9:
 	move $v0, $t0
 	jr $ra
 
-mod:
+lcx_mod:
+	lw $t0, 4($sp)
+	sw $t0, v4
+	lw $t0, 8($sp)
+	sw $t0, v5
 	lw $t1, v4
 	lw $t2, v5
 	div $t1, $t2
@@ -307,18 +320,30 @@ main:
 	sw $t0, v14
 	li $t0, 0
 	sw $t0, v13
-	sw $sp, v11
 	addi $sp, $sp, -4000
+	sw $sp, v11
 label23:
+	lw $t0, v15
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	jal lcx_isqrt
+	move $t0, $v0
+	sw $t0, t83
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v15
 	lw $t0, t83
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal isqrt
-	lw $t0, t83
+	jal lcx_isqrt
 	move $t0, $v0
-	sw $t0, t83
+	sw $t0, t82
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
@@ -329,50 +354,51 @@ label23:
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal isqrt
-	lw $t0, t82
-	move $t0, $v0
-	sw $t0, t82
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	sw $t0, t82
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	jal fact
-	lw $t0, t81
+	jal lcx_fact
 	move $t0, $v0
 	sw $t0, t81
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, t82
 	lw $t0, v10
 	lw $t1, t81
 	blt $t0, $t1, label24
 	j label25
 label24:
-	lw $t0, t20
+	li $t0, 4
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, v10
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal mod
-	lw $t0, t20
+	jal lcx_mod
 	move $t0, $v0
 	sw $t0, t20
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t20
+	sw $t0, v10
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v4
+	lw $t0, t20
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal fact
-	lw $t0, t19
+	jal lcx_fact
 	move $t0, $v0
 	sw $t0, t19
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, t20
 	lw $t1, v11
 	move $t0, $t1
 	sw $t0, t22
@@ -465,14 +491,25 @@ label10:
 	blt $t0, $t1, label11
 	j label12
 label11:
+	li $t0, 10
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, v6
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal mod
-	lw $t0, t18
+	jal lcx_mod
 	move $t0, $v0
 	sw $t0, t18
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v6
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v10
 	lw $t1, t18
 	li $t2, 10
 	add $t0, $t1, $t2
@@ -498,6 +535,19 @@ label11:
 	sw $t0, v7
 	j label10
 label12:
+	lw $t0, v7
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	jal lcx_isqrt
+	move $t0, $v0
+	sw $t0, t41
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v7
 	li $t0, 10
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
@@ -506,10 +556,9 @@ label12:
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal isqrt
-	lw $t0, t41
+	jal lcx_mod
 	move $t0, $v0
-	sw $t0, t41
+	sw $t0, t40
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
@@ -523,23 +572,14 @@ label12:
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal mod
-	lw $t0, t40
+	jal lcx_fact
 	move $t0, $v0
-	sw $t0, t40
+	sw $t0, t39
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
 	sw $t0, t40
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	jal fact
-	lw $t0, t39
-	move $t0, $v0
-	sw $t0, t39
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
 	lw $t1, v7
 	lw $t2, t39
 	add $t0, $t1, $t2

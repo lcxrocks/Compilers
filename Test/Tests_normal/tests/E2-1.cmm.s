@@ -60,10 +60,10 @@ write:
 main:
 	li $t0, 5
 	sw $t0, v4
+	addi $sp, $sp, -100
 	sw $sp, v3
 	addi $sp, $sp, -100
 	sw $sp, v6
-	addi $sp, $sp, -100
 	li $t0, 0
 	sw $t0, v1
 label7:

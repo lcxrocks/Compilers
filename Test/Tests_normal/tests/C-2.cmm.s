@@ -86,7 +86,11 @@ write:
 	move $v0, $0
 	jr $ra
 
-bit_and:
+lcx_bit_and:
+	lw $t0, 4($sp)
+	sw $t0, v1
+	lw $t0, 8($sp)
+	sw $t0, v2
 	lw $t0, v1
 	li $t1, 0
 	beq $t0, $t1, label1
@@ -102,7 +106,11 @@ label2:
 	jr $ra
 label3:
 
-bit_or:
+lcx_bit_or:
+	lw $t0, 4($sp)
+	sw $t0, v3
+	lw $t0, 8($sp)
+	sw $t0, v4
 	lw $t0, v3
 	li $t1, 0
 	beq $t0, $t1, label4
@@ -118,7 +126,9 @@ label5:
 	jr $ra
 label6:
 
-bit_not:
+lcx_bit_not:
+	lw $t0, 4($sp)
+	sw $t0, v5
 	lw $t0, v5
 	li $t1, 0
 	beq $t0, $t1, label7
@@ -134,7 +144,11 @@ label8:
 	jr $ra
 label9:
 
-mod:
+lcx_mod:
+	lw $t0, 4($sp)
+	sw $t0, v6
+	lw $t0, 8($sp)
+	sw $t0, v7
 	lw $t1, v6
 	lw $t2, v7
 	div $t1, $t2
@@ -152,15 +166,19 @@ mod:
 	move $v0, $t0
 	jr $ra
 
-and:
+lcx_and:
+	lw $t0, 4($sp)
+	sw $t0, v8
+	lw $t0, 8($sp)
+	sw $t0, v9
 	li $t0, 32
 	sw $t0, v15
+	addi $sp, $sp, -128
 	sw $sp, v11
 	addi $sp, $sp, -128
 	sw $sp, v12
 	addi $sp, $sp, -128
 	sw $sp, v13
-	addi $sp, $sp, -128
 	li $t0, 0
 	sw $t0, v10
 	li $t0, 0
@@ -244,14 +262,25 @@ label16:
 	blt $t0, $t1, label17
 	j label18
 label17:
+	li $t0, 2
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, v8
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal mod
-	lw $t0, t14
+	jal lcx_mod
 	move $t0, $v0
 	sw $t0, t14
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v8
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v2
 	lw $t1, v11
 	move $t0, $t1
 	sw $t0, t16
@@ -266,14 +295,25 @@ label17:
 	lw $t0, t15
 	lw $t1, t14
 	sw $t1, 0($t0)
+	li $t0, 2
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, v9
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal mod
-	lw $t0, t18
+	jal lcx_mod
 	move $t0, $v0
 	sw $t0, t18
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v9
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v2
 	lw $t1, v12
 	move $t0, $t1
 	sw $t0, t20
@@ -349,14 +389,25 @@ label20:
 	lw $t1, t30
 	lw $t0, 0($t1)
 	sw $t0, t33
+	lw $t0, t33
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, t29
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal bit_and
-	lw $t0, t25
+	jal lcx_bit_and
 	move $t0, $v0
 	sw $t0, t25
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, t29
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, t33
 	lw $t1, v13
 	move $t0, $t1
 	sw $t0, t35
@@ -452,14 +503,25 @@ main:
 	lw $t1, t47
 	move $t0, $t1
 	sw $t0, v17
+	lw $t0, v17
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, v16
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal and
-	lw $t0, t48
+	jal lcx_and
 	move $t0, $v0
 	sw $t0, t48
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v16
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v17
 	lw $t0, t48
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)

@@ -43,8 +43,8 @@ write:
 	jr $ra
 
 main:
-	sw $sp, v1
 	addi $sp, $sp, -16
+	sw $sp, v1
 	li $t0, 0
 	sw $t0, v2
 	lw $t1, v1

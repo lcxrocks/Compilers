@@ -148,7 +148,11 @@ write:
 	move $v0, $0
 	jr $ra
 
-dot_product:
+lcx_dot_product:
+	lw $t0, 4($sp)
+	sw $t0, v1
+	lw $t0, 8($sp)
+	sw $t0, v2
 	lw $t1, v1
 	move $t0, $t1
 	sw $t0, t5
@@ -257,7 +261,13 @@ dot_product:
 	move $v0, $t0
 	jr $ra
 
-cross_product:
+lcx_cross_product:
+	lw $t0, 4($sp)
+	sw $t0, v3
+	lw $t0, 8($sp)
+	sw $t0, v4
+	lw $t0, 12($sp)
+	sw $t0, v5
 	lw $t1, v3
 	move $t0, $t1
 	sw $t0, t33
@@ -509,10 +519,10 @@ cross_product:
 	jr $ra
 
 main:
-	sw $sp, v8
 	addi $sp, $sp, -24
-	sw $sp, v9
+	sw $sp, v8
 	addi $sp, $sp, -12
+	sw $sp, v9
 	li $t0, 0
 	sw $t0, v6
 label4:
@@ -622,28 +632,56 @@ label6:
 	lw $t1, v9
 	move $t0, $t1
 	sw $t0, t116
+	lw $t0, t116
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, t113
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, t110
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal cross_product
-	lw $t0, t117
+	jal lcx_cross_product
 	move $t0, $v0
 	sw $t0, t117
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, t110
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, t113
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, t116
 	lw $t1, v9
 	move $t0, $t1
 	sw $t0, t119
 	lw $t1, v9
 	move $t0, $t1
 	sw $t0, t120
+	lw $t0, t120
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, t119
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal dot_product
-	lw $t0, t118
+	jal lcx_dot_product
 	move $t0, $v0
 	sw $t0, t118
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, t119
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, t120
 	lw $t0, t118
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)

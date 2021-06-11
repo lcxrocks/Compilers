@@ -1,10 +1,10 @@
 #!/bin/bash
+rm Test/Tests_normal/tests/*.s
 for file in Test/Tests_normal/tests/*
 do
     if test -f $file
     then
         echo $file 是文件
-        rm $file.out 
         ./parser $file $file.s
     fi
     if test -d $file

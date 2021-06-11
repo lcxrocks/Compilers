@@ -44,7 +44,11 @@ write:
 	move $v0, $0
 	jr $ra
 
-add:
+lcx_add:
+	lw $t0, 4($sp)
+	sw $t0, v1
+	lw $t0, 8($sp)
+	sw $t0, v2
 	lw $t1, v1
 	lw $t2, v2
 	add $t0, $t1, $t2
@@ -53,7 +57,11 @@ add:
 	move $v0, $t0
 	jr $ra
 
-sub:
+lcx_sub:
+	lw $t0, 4($sp)
+	sw $t0, v3
+	lw $t0, 8($sp)
+	sw $t0, v4
 	lw $t1, v3
 	lw $t2, v4
 	sub $t0, $t1, $t2
@@ -62,7 +70,11 @@ sub:
 	move $v0, $t0
 	jr $ra
 
-mul:
+lcx_mul:
+	lw $t0, 4($sp)
+	sw $t0, v5
+	lw $t0, 8($sp)
+	sw $t0, v6
 	lw $t1, v5
 	lw $t2, v6
 	mul $t0, $t1, $t2
@@ -120,10 +132,28 @@ main:
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal sub
-	lw $t0, t10
+	jal lcx_sub
 	move $t0, $v0
 	sw $t0, t10
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v7
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v8
+	lw $t0, v8
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, v7
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	jal lcx_sub
+	move $t0, $v0
+	sw $t0, t11
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
@@ -140,10 +170,9 @@ main:
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal sub
-	lw $t0, t11
+	jal lcx_mul
 	move $t0, $v0
-	sw $t0, t11
+	sw $t0, t9
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
@@ -160,10 +189,9 @@ main:
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal mul
-	lw $t0, t9
+	jal lcx_add
 	move $t0, $v0
-	sw $t0, t9
+	sw $t0, t12
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
@@ -180,10 +208,9 @@ main:
 	sw $t0, 0($sp)
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal add
-	lw $t0, t12
+	jal lcx_add
 	move $t0, $v0
-	sw $t0, t12
+	sw $t0, t8
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
@@ -192,14 +219,6 @@ main:
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
 	sw $t0, t12
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	jal add
-	lw $t0, t8
-	move $t0, $v0
-	sw $t0, t8
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
 	lw $t1, t8
 	move $t0, $t1
 	sw $t0, v11

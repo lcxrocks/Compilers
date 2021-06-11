@@ -92,24 +92,6 @@ void print_arith(FILE* fp, InterCode *ir){
     // reg(fp, ir->binop.result, 0);
     reg(fp, ir->binop.op1, 1);
     reg(fp, ir->binop.op2, 2);
-    // if(ir->binop.op1->op_kind == OP_CONSTANT){
-    //     fprintf(fp, "\tli $t1, %d\n", ir->binop.op1->const_value);
-    //     if(ir->binop.op2->op_kind == OP_CONSTANT){
-    //         fprintf(fp, "\tli $t2, %d\n", ir->binop.op2->const_value);
-    //     }
-    //     else{
-    //         reg(fp, ir->binop.op2, 2);
-    //     }
-    // }
-    // else{
-    //     reg(fp, ir->binop.op1, 1);
-    //     if(ir->binop.op2->op_kind == OP_CONSTANT){
-    //         fprintf(fp, "\tli $t2, %d\n", ir->binop.op2->const_value);
-    //     }
-    //     else{
-    //         reg(fp, ir->binop.op2, 2);
-    //     }
-    // }
     switch (ir->ir_kind)
     {
     case IR_ADD:
@@ -228,19 +210,33 @@ void print_mips(FILE* fp, InterCodes *start){
             break;
         case IR_DEC:
             // array
-            fprintf(fp, "\tsw $sp, v%d\n", ir->lr.op1->var_no);
             fprintf(fp, "\taddi $sp, $sp, -%d\n", ir->lr.op2->const_value);
+            fprintf(fp, "\tsw $sp, v%d\n", ir->lr.op1->var_no);
             break;
         case IR_FUNCTION: 
-            // dont care PARAM
             fprintf(fp, "\n");
-            fprintf(fp, "%s:\n", ir->unop.op->func_name);
+            if(strcmp(ir->unop.op->func_name, "main")!=0){
+                fprintf(fp, "lcx_%s:\n", ir->unop.op->func_name);
+            }
+            else{
+                fprintf(fp, "main:\n");
+            }
+            InterCodes *param = p->next;
+            int offset = 0;
+            while(param->code->ir_kind == IR_PARAM){
+                offset += 4;
+                fprintf(fp, "\tlw $t0, %d($sp)\n", offset);
+                spill(fp, param->code->unop.op, 0);
+                param = param->next;
+            }
+            p = param->prev;
             break;
-        case IR_CALL_FUNC:
-            //need more details: ARGS
-            log("print_mips: IR_CALL_FUNC need more details\n");
-            InterCodes *arg = p->next;
+        
+        case IR_ARG:
+            ;
+            InterCodes *arg = p;
             int arg_cnt = 0;
+            Assert(arg->code->ir_kind == IR_ARG);
             while(arg->code->ir_kind == IR_ARG){
                 arg_cnt++;
                 reg(fp, arg->code->unop.op, 0);
@@ -248,12 +244,21 @@ void print_mips(FILE* fp, InterCodes *start){
                 fprintf(fp, "\tsw $t0, 0($sp)\n");
                 arg = arg->next;
             }
+            // core:
+            p = arg;
+            ir = p->code;
+            Assert(p->code->ir_kind == IR_CALL_FUNC);
             arg = arg->prev;
             if(arg_cnt > 0) Assert(arg->code->ir_kind == IR_ARG); // first arg
             fprintf(fp, "\taddi $sp, $sp, -4\n");
             fprintf(fp, "\tsw $ra, 0($sp)\n");
-            fprintf(fp, "\tjal %s\n", ir->lr.op2->func_name);
-            reg(fp, ir->lr.op1, 0);
+            if(strcmp(ir->lr.op2->func_name, "main")!=0){
+                fprintf(fp, "\tjal lcx_%s\n", ir->lr.op2->func_name);
+            }  
+            else{
+                fprintf(fp, "\tjal main\n");
+            }
+            //reg(fp, ir->lr.op1, 0);
             fprintf(fp, "\tmove $t0, $v0\n");
             spill(fp, ir->lr.op1, 0);
             fprintf(fp, "\tlw $ra, 0($sp)\n");
@@ -266,6 +271,21 @@ void print_mips(FILE* fp, InterCodes *start){
                 arg = arg->prev;
             }
             Assert(arg_cnt == 0);
+            break;
+        case IR_CALL_FUNC:
+            fprintf(fp, "\taddi $sp, $sp, -4\n");
+            fprintf(fp, "\tsw $ra, 0($sp)\n");
+            if(strcmp(ir->lr.op2->func_name, "main")!=0){
+                fprintf(fp, "\tjal lcx_%s\n", ir->lr.op2->func_name);
+            }  
+            else{
+                fprintf(fp, "\tjal main\n");
+            }
+            //reg(fp, ir->lr.op1, 0);
+            fprintf(fp, "\tmove $t0, $v0\n");
+            spill(fp, ir->lr.op1, 0);
+            fprintf(fp, "\tlw $ra, 0($sp)\n");
+            fprintf(fp, "\taddi $sp, $sp, 4\n");
             break;
         case IR_RETURN:
             reg(fp, ir->unop.op, 0);
