@@ -997,4 +997,5 @@ void print_ir(FILE *fp, InterCodes *start){
         fprintf(fp, "\n");
         p = p->next;
     }
+    log("finished translating ir\n");
 }

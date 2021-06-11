@@ -140,6 +140,15 @@ struct ArgList_ {
     ArgList* next;
 };
 
+// Lab4
+struct FuncRecord_{
+    int func_no;
+    char *func_name;
+    int array_size; // restore stack
+    ArgList *args; // restore param
+    FuncRecord* next;
+};
+
 #define printk printf
 
 // assert.h

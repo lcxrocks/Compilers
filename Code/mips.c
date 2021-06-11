@@ -1,5 +1,8 @@
 #include "common.h"
 extern InterCodes *head;
+FuncRecord* record_head = NULL;
+
+FuncRecord* cur_function = NULL;
 
 void init_read(FILE* fp){
     fprintf(fp, "\n");
@@ -37,6 +40,7 @@ void init_memory(FILE* fp, InterCodes *start){
     // should keep record of exsisting var/temp  
     int var_cnt = 0;
     int temp_cnt = 0;
+    int function_cnt = 0;
     InterCodes *p = start;
     while(p){
         InterCode *ir = p->code;
@@ -48,9 +52,26 @@ void init_memory(FILE* fp, InterCodes *start){
             if(ir->unop.op->tmp_no > temp_cnt) temp_cnt = ir->unop.op->tmp_no;
             // log("found t%d\n", ir->unop.op->var_no);
         }
+        else if(ir->ir_kind == IR_FUNCTION){
+            function_cnt++;
+            FuncRecord *func = (FuncRecord *)malloc(sizeof(FuncRecord));
+            Assert(p->code->unop.op->func_name!=NULL);
+            func->func_name = p->code->unop.op->func_name;
+            func->func_no = function_cnt;
+            func->array_size = 0;
+            func->args = NULL;
+            func->next = NULL;
+            if(record_head==NULL){
+                record_head = func;
+            }
+            else{
+                func->next = record_head;
+                record_head = func;
+            }
+        }
         p = p->next;
     }
-    log("var_cnt: %d, temp_cnt: %d\n", var_cnt, temp_cnt);
+    log("var_cnt: %d, temp_cnt: %d ,func_cnt: %d\n", var_cnt, temp_cnt, function_cnt);
     init_var(fp, var_cnt, temp_cnt);
 }
 
@@ -126,6 +147,10 @@ void push_ra(FILE* fp){
 void pop_ra(FILE* fp){
     fprintf(fp, "\tlw $ra, 0($sp)\n");
     fprintf(fp, "\taddi $sp, $sp, 4\n");
+}
+
+void save_param(FILE* fp){
+
 }
 
 void print_mips(FILE* fp, InterCodes *start){
@@ -226,6 +251,8 @@ void print_mips(FILE* fp, InterCodes *start){
             // array
             fprintf(fp, "\taddi $sp, $sp, -%d\n", ir->lr.op2->const_value);
             fprintf(fp, "\tsw $sp, v%d\n", ir->lr.op1->var_no);
+            Assert(cur_function!=NULL);
+            cur_function->array_size = ir->lr.op2->const_value;
             break;
         case IR_FUNCTION: 
             fprintf(fp, "\n");
@@ -235,8 +262,34 @@ void print_mips(FILE* fp, InterCodes *start){
             else{
                 fprintf(fp, "main:\n");
             }
+            /*
+                record.
+            */
+            FuncRecord* tmp = record_head;
+            while(tmp!=NULL){
+                log("checking on %s (cur: %s)\n", tmp->func_name, ir->unop.op->func_name);
+                if(strcmp(ir->unop.op->func_name, tmp->func_name)==0) {
+                    break;
+                }
+                else tmp = tmp->next;
+            }
+            Assert(tmp!=NULL && tmp->func_name == ir->unop.op->func_name);
+            cur_function = tmp;
+
             InterCodes *param = p->next;
             int offset = 0;
+            while(param->code->ir_kind == IR_PARAM){
+                ArgList *arg_tmp = (ArgList *)malloc(sizeof(ArgList));
+                arg_tmp->arg = param->code->unop.op;
+                arg_tmp->next = cur_function->args;
+                cur_function->args = arg_tmp;
+                offset += 4;
+                reg(fp, param->code->unop.op, 0);
+                fprintf(fp, "\taddi $sp, $sp, -4\n");
+                fprintf(fp, "\tsw $t0, 0($sp)\n");
+                param = param->next;
+            }
+            param = p->next;
             while(param->code->ir_kind == IR_PARAM){
                 cnt++;
                 offset += 4;
@@ -273,9 +326,6 @@ void print_mips(FILE* fp, InterCodes *start){
             else{
                 fprintf(fp, "\tjal main\n");
             }
-            //reg(fp, ir->lr.op1, 0);
-            fprintf(fp, "\tmove $t0, $v0\n");
-            spill(fp, ir->lr.op1, 0);
             pop_ra(fp);
             while(arg->code->ir_kind == IR_ARG){
                 arg_cnt--;
@@ -284,11 +334,12 @@ void print_mips(FILE* fp, InterCodes *start){
                 spill(fp, arg->code->unop.op, 0);
                 arg = arg->prev;
             }
+            fprintf(fp, "\tmove $t0, $v0\n");
+            spill(fp, ir->lr.op1, 0);
             Assert(arg_cnt == 0);
             break;
         case IR_CALL_FUNC:
-            fprintf(fp, "\taddi $sp, $sp, -4\n");
-            fprintf(fp, "\tsw $ra, 0($sp)\n");
+            push_ra(fp);
             if(strcmp(ir->lr.op2->func_name, "main")!=0){
                 fprintf(fp, "\tjal lcx_%s\n", ir->lr.op2->func_name);
             }  
@@ -298,10 +349,22 @@ void print_mips(FILE* fp, InterCodes *start){
             //reg(fp, ir->lr.op1, 0);
             fprintf(fp, "\tmove $t0, $v0\n");
             spill(fp, ir->lr.op1, 0);
-            fprintf(fp, "\tlw $ra, 0($sp)\n");
-            fprintf(fp, "\taddi $sp, $sp, 4\n");
+            pop_ra(fp);
             break;
         case IR_RETURN:
+            
+            // 1. $sp + array_size
+            if(cur_function->array_size!=0){
+                fprintf(fp, "\taddi $sp, $sp, %d\n", cur_function->array_size);
+            }   
+            // 2. pop args
+            ArgList* arg_tmp = cur_function->args;
+            while(arg_tmp!=NULL){
+                fprintf(fp, "\tlw $t0, 0($sp)\n");
+                fprintf(fp, "\taddi $sp, $sp, 4\n");
+                spill(fp, arg_tmp->arg, 0);
+                arg_tmp = arg_tmp->next;
+            }
             reg(fp, ir->unop.op, 0);
             fprintf(fp, "\tmove $v0, $t0\n");
             fprintf(fp, "\tjr $ra\n");
