@@ -277,41 +277,7 @@ void print_mips(FILE* fp, InterCodes *start){
             else{
                 fprintf(fp, "main:\n");
             }
-            /*
-                record.
-            */
-            // FuncRecord* tmp = record_head;
-            // while(tmp!=NULL){
-            //     if(strcmp(ir->unop.op->func_name, tmp->func_name)==0) {
-            //         break;
-            //     }
-            //     else tmp = tmp->next;
-            // }
-            // Assert(tmp!=NULL && tmp->func_name == ir->unop.op->func_name);
             cur_function = find_function(ir->unop.op->func_name);
-
-            // InterCodes *param = p->next;
-            // int offset = 0;
-            // while(param->code->ir_kind == IR_PARAM){
-            //     ArgList *arg_tmp = (ArgList *)malloc(sizeof(ArgList));
-            //     arg_tmp->arg = param->code->unop.op;
-            //     arg_tmp->next = cur_function->args;
-            //     cur_function->args = arg_tmp;
-            //     offset += 4;
-            //     reg(fp, param->code->unop.op, 0);
-            //     fprintf(fp, "\taddi $sp, $sp, -4\n");
-            //     fprintf(fp, "\tsw $t0, 0($sp)\n");
-            //     param = param->next;
-            // }
-            // param = p->next;
-            // while(param->code->ir_kind == IR_PARAM){
-            //     cnt++;
-            //     offset += 4;
-            //     fprintf(fp, "\tlw $t0, %d($sp)\n", offset);
-            //     spill(fp, param->code->unop.op, 0);
-            //     param = param->next;
-            // }
-            // p = param->prev;
             break;
         
         case IR_ARG: // call function with args
@@ -331,13 +297,6 @@ void print_mips(FILE* fp, InterCodes *start){
             Assert(p->code->ir_kind == IR_CALL_FUNC);
             FuncRecord* tmp = find_function(a->code->lr.op2->func_name);
             ArgList* func_args = tmp->args; // last param
-            // while(func_args!=NULL){
-            //     reg(fp, func_args->arg, 0);    
-            //     fprintf(fp, "\taddi $sp, $sp, -4\n");
-            //     fprintf(fp, "\tsw $t0, 0($sp)\n");
-            //     func_args = func_args->next;            
-            // }
-
             // 2. change args
             InterCodes *arg_end = a->prev;
             Assert(arg_end->code->ir_kind == IR_ARG); 
@@ -401,14 +360,6 @@ void print_mips(FILE* fp, InterCodes *start){
             if(cur_function->array_size!=0){
                 fprintf(fp, "\taddi $sp, $sp, %d\n", cur_function->array_size);
             }
-            // // 2. pop args ------> should do this when next function starts
-            // ArgList* arg_tmp = cur_function->args;
-            // while(arg_tmp!=NULL){
-            //     fprintf(fp, "\tlw $t0, 0($sp)\n");
-            //     fprintf(fp, "\taddi $sp, $sp, 4\n");
-            //     spill(fp, arg_tmp->arg, 0);
-            //     arg_tmp = arg_tmp->next;
-            // }
             //cur_function = NULL;
             reg(fp, ir->unop.op, 0);
             fprintf(fp, "\tmove $v0, $t0\n");
