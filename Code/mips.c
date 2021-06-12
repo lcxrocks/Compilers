@@ -316,19 +316,21 @@ void print_mips(FILE* fp, InterCodes *start){
         
         case IR_ARG: // call function with args
             ;
-            InterCodes *arg = p;
+            InterCodes *arg_begin = p;
+            InterCodes *a = arg_begin;
             int arg_cnt = 0;
-            Assert(arg->code->ir_kind == IR_ARG);
+            Assert(a->code->ir_kind == IR_ARG);
             // find the function to be called and save its args
 
             // 1. save PARAMs
-            while(arg->code->ir_kind == IR_ARG){
-                arg = arg->next;
+            while(a->code->ir_kind == IR_ARG){
+                a = a->next;
             }
-            p = arg;
+            
+            p = a;
             Assert(p->code->ir_kind == IR_CALL_FUNC);
-            FuncRecord* tmp = find_function(arg->code->lr.op2->func_name);
-            ArgList* func_args = tmp->args;
+            FuncRecord* tmp = find_function(a->code->lr.op2->func_name);
+            ArgList* func_args = tmp->args; // last param
             // while(func_args!=NULL){
             //     reg(fp, func_args->arg, 0);    
             //     fprintf(fp, "\taddi $sp, $sp, -4\n");
@@ -337,20 +339,21 @@ void print_mips(FILE* fp, InterCodes *start){
             // }
 
             // 2. change args
-            arg = arg->prev;
-            Assert(arg->code->ir_kind == IR_ARG); // first param (last arg)
+            InterCodes *arg_end = a->prev;
+            Assert(arg_end->code->ir_kind == IR_ARG); 
             int param_offset = 0;
-            while(arg->code->ir_kind == IR_ARG){
+            a = arg_begin;
+            while(a->code->ir_kind == IR_ARG){
                 cnt++;
-                param_offset += 4;
+                //param_offset += 4;
                 reg(fp, func_args->arg, 0);
                 fprintf(fp, "\taddi $sp, $sp, -4\n");
                 fprintf(fp, "\tsw $t0, 0($sp)\n");
-                reg(fp, arg->code->unop.op, 0);
+                reg(fp, a->code->unop.op, 0);
                 spill(fp, func_args->arg, 0);
 
                 func_args = func_args->next;
-                arg = arg->prev;
+                a = a->next;
             }
             Assert(func_args == NULL);
             
@@ -367,7 +370,7 @@ void print_mips(FILE* fp, InterCodes *start){
             }
             pop_ra(fp);
 
-            func_args = tmp->args; // first param
+            func_args = tmp->args; // last param
             int i = 0;
             while(func_args!=NULL){
                 i += 1;
