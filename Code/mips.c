@@ -371,11 +371,9 @@ void print_mips(FILE* fp, InterCodes *start){
             pop_ra(fp);
 
             func_args = tmp->args; // last param
-            int i = 0;
             while(func_args!=NULL){
-                i += 1;
                 //param_offset -= 4;
-                fprintf(fp, "\tlw $t0, %d($sp)\n", param_offset-4*i);
+                fprintf(fp, "\tlw $t0, %d($sp)\n", 0);
                 fprintf(fp, "\taddi $sp, $sp, 4\n");
                 spill(fp, func_args->arg, 0);
                 func_args = func_args->next;

@@ -76,7 +76,7 @@ label2:
 	jal lcx_fact
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	lw $t0, -4($sp)
+	lw $t0, 0($sp)
 	addi $sp, $sp, 4
 	sw $t0, v1
 	move $t0, $v0
@@ -197,7 +197,7 @@ lcx_is_prime:
 	jal lcx_isqrt
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	lw $t0, -4($sp)
+	lw $t0, 0($sp)
 	addi $sp, $sp, 4
 	sw $t0, v2
 	move $t0, $v0
@@ -226,10 +226,10 @@ label17:
 	jal lcx_mod
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	lw $t0, -4($sp)
+	lw $t0, 0($sp)
 	addi $sp, $sp, 4
 	sw $t0, v5
-	lw $t0, -8($sp)
+	lw $t0, 0($sp)
 	addi $sp, $sp, 4
 	sw $t0, v4
 	move $t0, $v0
@@ -280,7 +280,7 @@ label21:
 	jal lcx_fact
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	lw $t0, -4($sp)
+	lw $t0, 0($sp)
 	addi $sp, $sp, 4
 	sw $t0, v1
 	move $t0, $v0
@@ -300,7 +300,7 @@ label22:
 	jal lcx_is_prime
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	lw $t0, -4($sp)
+	lw $t0, 0($sp)
 	addi $sp, $sp, 4
 	sw $t0, v6
 	move $t0, $v0
