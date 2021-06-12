@@ -61,6 +61,16 @@ void init_memory(FILE* fp, InterCodes *start){
             func->array_size = 0;
             func->args = NULL;
             func->next = NULL;
+            InterCodes *param = p->next;
+            int offset = 0;
+            while(param->code->ir_kind == IR_PARAM){
+                ArgList *arg_tmp = (ArgList *)malloc(sizeof(ArgList));
+                arg_tmp->arg = param->code->unop.op;
+                arg_tmp->next = func->args;
+                func->args = arg_tmp;
+                param = param->next;
+            }
+            p = param->prev;
             if(record_head==NULL){
                 record_head = func;
             }
@@ -144,6 +154,18 @@ void push_ra(FILE* fp){
 void pop_ra(FILE* fp){
     fprintf(fp, "\tlw $ra, 0($sp)\n");
     fprintf(fp, "\taddi $sp, $sp, 4\n");
+}
+
+FuncRecord* find_function(char *func_name){
+    FuncRecord* tmp = record_head;
+    while(tmp!=NULL){
+        if(strcmp(func_name, tmp->func_name)==0) {
+            break;
+        }
+        else tmp = tmp->next;
+    }
+    Assert(tmp!=NULL);
+    return tmp;
 }
 
 void print_mips(FILE* fp, InterCodes *start){
@@ -258,59 +280,84 @@ void print_mips(FILE* fp, InterCodes *start){
             /*
                 record.
             */
-            FuncRecord* tmp = record_head;
-            while(tmp!=NULL){
-                if(strcmp(ir->unop.op->func_name, tmp->func_name)==0) {
-                    break;
-                }
-                else tmp = tmp->next;
-            }
-            Assert(tmp!=NULL && tmp->func_name == ir->unop.op->func_name);
-            cur_function = tmp;
+            // FuncRecord* tmp = record_head;
+            // while(tmp!=NULL){
+            //     if(strcmp(ir->unop.op->func_name, tmp->func_name)==0) {
+            //         break;
+            //     }
+            //     else tmp = tmp->next;
+            // }
+            // Assert(tmp!=NULL && tmp->func_name == ir->unop.op->func_name);
+            cur_function = find_function(ir->unop.op->func_name);
 
-            InterCodes *param = p->next;
-            int offset = 0;
-            while(param->code->ir_kind == IR_PARAM){
-                ArgList *arg_tmp = (ArgList *)malloc(sizeof(ArgList));
-                arg_tmp->arg = param->code->unop.op;
-                arg_tmp->next = cur_function->args;
-                cur_function->args = arg_tmp;
-                offset += 4;
-                reg(fp, param->code->unop.op, 0);
-                fprintf(fp, "\taddi $sp, $sp, -4\n");
-                fprintf(fp, "\tsw $t0, 0($sp)\n");
-                param = param->next;
-            }
-            param = p->next;
-            while(param->code->ir_kind == IR_PARAM){
-                cnt++;
-                offset += 4;
-                fprintf(fp, "\tlw $t0, %d($sp)\n", offset);
-                spill(fp, param->code->unop.op, 0);
-                param = param->next;
-            }
-            p = param->prev;
+            // InterCodes *param = p->next;
+            // int offset = 0;
+            // while(param->code->ir_kind == IR_PARAM){
+            //     ArgList *arg_tmp = (ArgList *)malloc(sizeof(ArgList));
+            //     arg_tmp->arg = param->code->unop.op;
+            //     arg_tmp->next = cur_function->args;
+            //     cur_function->args = arg_tmp;
+            //     offset += 4;
+            //     reg(fp, param->code->unop.op, 0);
+            //     fprintf(fp, "\taddi $sp, $sp, -4\n");
+            //     fprintf(fp, "\tsw $t0, 0($sp)\n");
+            //     param = param->next;
+            // }
+            // param = p->next;
+            // while(param->code->ir_kind == IR_PARAM){
+            //     cnt++;
+            //     offset += 4;
+            //     fprintf(fp, "\tlw $t0, %d($sp)\n", offset);
+            //     spill(fp, param->code->unop.op, 0);
+            //     param = param->next;
+            // }
+            // p = param->prev;
             break;
         
-        case IR_ARG:
+        case IR_ARG: // call function with args
             ;
             InterCodes *arg = p;
             int arg_cnt = 0;
             Assert(arg->code->ir_kind == IR_ARG);
+            // find the function to be called and save its args
+
+            // 1. save PARAMs
             while(arg->code->ir_kind == IR_ARG){
-                cnt++;
-                arg_cnt++;
-                reg(fp, arg->code->unop.op, 0);
-                fprintf(fp, "\taddi $sp, $sp, -4\n");
-                fprintf(fp, "\tsw $t0, 0($sp)\n");
                 arg = arg->next;
             }
-            // core:
             p = arg;
-            ir = p->code;
             Assert(p->code->ir_kind == IR_CALL_FUNC);
+            FuncRecord* tmp = find_function(arg->code->lr.op2->func_name);
+            ArgList* func_args = tmp->args;
+            // while(func_args!=NULL){
+            //     reg(fp, func_args->arg, 0);    
+            //     fprintf(fp, "\taddi $sp, $sp, -4\n");
+            //     fprintf(fp, "\tsw $t0, 0($sp)\n");
+            //     func_args = func_args->next;            
+            // }
+
+            // 2. change args
             arg = arg->prev;
-            if(arg_cnt > 0) Assert(arg->code->ir_kind == IR_ARG); // first arg
+            Assert(arg->code->ir_kind == IR_ARG); // first param (last arg)
+            int param_offset = 0;
+            while(arg->code->ir_kind == IR_ARG){
+                cnt++;
+                param_offset += 4;
+                reg(fp, func_args->arg, 0);
+                fprintf(fp, "\taddi $sp, $sp, -4\n");
+                fprintf(fp, "\tsw $t0, 0($sp)\n");
+                reg(fp, arg->code->unop.op, 0);
+                spill(fp, func_args->arg, 0);
+
+                func_args = func_args->next;
+                arg = arg->prev;
+            }
+            Assert(func_args == NULL);
+            
+            // core:
+            ir = p->code;
+            Assert(ir->ir_kind == IR_CALL_FUNC);
+            
             push_ra(fp);
             if(strcmp(ir->lr.op2->func_name, "main")!=0){
                 fprintf(fp, "\tjal lcx_%s\n", ir->lr.op2->func_name);
@@ -319,18 +366,20 @@ void print_mips(FILE* fp, InterCodes *start){
                 fprintf(fp, "\tjal main\n");
             }
             pop_ra(fp);
-            while(arg->code->ir_kind == IR_ARG){
-                arg_cnt--;
-                fprintf(fp, "\tlw $t0, 0($sp)\n");
+
+            func_args = tmp->args; // first param
+            while(func_args!=NULL){
+                param_offset -= 4;
+                fprintf(fp, "\tlw $t0, %d($sp)\n", param_offset);
                 fprintf(fp, "\taddi $sp, $sp, 4\n");
-                spill(fp, arg->code->unop.op, 0);
-                arg = arg->prev;
+                spill(fp, func_args->arg, 0);
+                func_args = func_args->next;
             }
             fprintf(fp, "\tmove $t0, $v0\n");
             spill(fp, ir->lr.op1, 0);
             Assert(arg_cnt == 0);
             break;
-        case IR_CALL_FUNC:
+        case IR_CALL_FUNC: // no args
             push_ra(fp);
             if(strcmp(ir->lr.op2->func_name, "main")!=0){
                 fprintf(fp, "\tjal lcx_%s\n", ir->lr.op2->func_name);
@@ -349,14 +398,14 @@ void print_mips(FILE* fp, InterCodes *start){
             if(cur_function->array_size!=0){
                 fprintf(fp, "\taddi $sp, $sp, %d\n", cur_function->array_size);
             }
-            // 2. pop args ------> should do this when next function starts
-            ArgList* arg_tmp = cur_function->args;
-            while(arg_tmp!=NULL){
-                fprintf(fp, "\tlw $t0, 0($sp)\n");
-                fprintf(fp, "\taddi $sp, $sp, 4\n");
-                spill(fp, arg_tmp->arg, 0);
-                arg_tmp = arg_tmp->next;
-            }
+            // // 2. pop args ------> should do this when next function starts
+            // ArgList* arg_tmp = cur_function->args;
+            // while(arg_tmp!=NULL){
+            //     fprintf(fp, "\tlw $t0, 0($sp)\n");
+            //     fprintf(fp, "\taddi $sp, $sp, 4\n");
+            //     spill(fp, arg_tmp->arg, 0);
+            //     arg_tmp = arg_tmp->next;
+            // }
             //cur_function = NULL;
             reg(fp, ir->unop.op, 0);
             fprintf(fp, "\tmove $v0, $t0\n");
