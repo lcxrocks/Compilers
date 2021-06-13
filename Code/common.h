@@ -136,6 +136,7 @@ struct InterCodes_ {
 };
 
 struct ArgList_ {
+    int offset; // used only in Lab4
     Operand *arg;
     ArgList* next;
 };
@@ -144,15 +145,17 @@ struct ArgList_ {
 struct FuncRecord_{
     int func_no;
     char *func_name;
+    int tempo_size; // for restore
     int array_size; // restore stack
     ArgList *args; // restore param
+    ArgList *tempos;
     FuncRecord* next;
 };
 
 #define printk printf
 
 // assert.h
-#define NDEBUG
+//#define NDEBUG
 
 #ifdef NDEBUG
   #define Assert(cond) 1

@@ -1,7 +1,6 @@
 #include "common.h"
 extern InterCodes *head;
 FuncRecord* record_head = NULL;
-
 FuncRecord* cur_function = NULL;
 
 void init_read(FILE* fp){
@@ -36,6 +35,31 @@ void init_var(FILE* fp, int var_no, int temp_no){
     }
 }
 
+int search_tempo(FuncRecord* func, Operand* x){
+    int found = 0;
+    ArgList* tempo = func->tempos;
+    if(x->op_kind == OP_TEMP){
+        while(tempo!=NULL){
+            if(tempo->arg->op_kind==OP_TEMP && x->tmp_no == tempo->arg->tmp_no){
+                found = 1;
+                break;
+            }
+            tempo = tempo->next;
+        }
+    }
+    else{
+        Assert(x->op_kind == OP_VARIABLE);
+        while(tempo!=NULL){
+            if(tempo->arg->op_kind==OP_VARIABLE && x->var_no == tempo->arg->var_no){
+                found = 1;
+                break;
+            }
+            tempo = tempo->next;
+        }
+    }
+    return found;
+}
+
 void init_memory(FILE* fp, InterCodes *start){
     // should keep record of exsisting var/temp  
     int var_cnt = 0;
@@ -45,11 +69,29 @@ void init_memory(FILE* fp, InterCodes *start){
     while(p){
         InterCode *ir = p->code;
         if(ir->unop.op->op_kind == OP_VARIABLE){
+            Assert(record_head!=NULL);
             if(ir->unop.op->var_no > var_cnt) var_cnt = ir->unop.op->var_no;
+            if(search_tempo(record_head, ir->unop.op)==0){
+                ArgList* new_tempo = (ArgList *)malloc(sizeof(ArgList));
+                new_tempo->arg = ir->unop.op;
+                new_tempo->next = record_head->tempos;
+                new_tempo->offset = record_head->tempo_size;
+                record_head->tempos = new_tempo;
+                record_head->tempo_size+=4;
+            }
             //log("found v%d\n", ir->unop.op->var_no);
         }
         else if(ir->unop.op->op_kind == OP_TEMP){
+            Assert(record_head!=NULL);
             if(ir->unop.op->tmp_no > temp_cnt) temp_cnt = ir->unop.op->tmp_no;
+            if(search_tempo(record_head, ir->unop.op)==0){
+                ArgList* new_tempo = (ArgList *)malloc(sizeof(ArgList));
+                new_tempo->arg = ir->unop.op;
+                new_tempo->next = record_head->tempos;
+                new_tempo->offset = record_head->tempo_size;
+                record_head->tempos = new_tempo;
+                record_head->tempo_size+=4;
+            }
             // log("found t%d\n", ir->unop.op->var_no);
         }
         else if(ir->ir_kind == IR_FUNCTION){
@@ -58,19 +100,22 @@ void init_memory(FILE* fp, InterCodes *start){
             Assert(p->code->unop.op->func_name!=NULL);
             func->func_name = p->code->unop.op->func_name;
             func->func_no = function_cnt;
+            func->tempo_size = 0;
             func->array_size = 0;
+            func->tempos = NULL;
             func->args = NULL;
             func->next = NULL;
             InterCodes *param = p->next;
-            int offset = 0;
+            //int offset = 0;
             while(param->code->ir_kind == IR_PARAM){
                 ArgList *arg_tmp = (ArgList *)malloc(sizeof(ArgList));
                 arg_tmp->arg = param->code->unop.op;
                 arg_tmp->next = func->args;
+                arg_tmp->offset = 0;
                 func->args = arg_tmp;
                 param = param->next;
             }
-            p = param->prev;
+            //p = param->prev;
             if(record_head==NULL){
                 record_head = func;
             }
@@ -82,6 +127,18 @@ void init_memory(FILE* fp, InterCodes *start){
         p = p->next;
     }
     log("var_cnt: %d, temp_cnt: %d ,func_cnt: %d\n", var_cnt, temp_cnt, function_cnt);
+    FuncRecord* func_tmp = record_head;
+    while(func_tmp!=NULL){
+        log("Function: %s (total offset: %d)\n", func_tmp->func_name, func_tmp->tempo_size);
+        ArgList* temps = func_tmp->tempos;
+        while (temps!=NULL)
+        {
+            if(temps->arg->op_kind==OP_VARIABLE) log("v%d, offset: %d\n", temps->arg->var_no, temps->offset);
+            else log("t%d, offset: %d\n", temps->arg->tmp_no, temps->offset);
+            temps = temps->next;
+        }
+        func_tmp = func_tmp->next;
+    }
     init_var(fp, var_cnt, temp_cnt);
 }
 
@@ -166,6 +223,30 @@ FuncRecord* find_function(char *func_name){
     }
     Assert(tmp!=NULL);
     return tmp;
+}
+
+void push_tempos(FILE* fp){
+    Assert(cur_function!=NULL);
+    ArgList* temps = cur_function->tempos;
+    fprintf(fp, "\taddi $sp, $sp, -%d\n", cur_function->tempo_size);
+    while (temps!=NULL)
+    {
+        reg(fp, temps->arg, 0);
+        fprintf(fp, "\tsw $t0, %d($sp)\n", temps->offset);
+        temps = temps->next;
+    }
+}
+
+void pop_tempos(FILE* fp){
+    Assert(cur_function!=NULL);
+    ArgList* temps = cur_function->tempos;
+    while (temps!=NULL)
+    {
+        fprintf(fp, "\tlw $t0, %d($sp)\n", temps->offset);
+        spill(fp, temps->arg, 0);
+        temps = temps->next;
+    }
+    fprintf(fp, "\taddi $sp, $sp, %d\n", cur_function->tempo_size);
 }
 
 void print_mips(FILE* fp, InterCodes *start){
@@ -287,7 +368,7 @@ void print_mips(FILE* fp, InterCodes *start){
             int arg_cnt = 0;
             Assert(a->code->ir_kind == IR_ARG);
             // find the function to be called and save its args
-
+            push_tempos(fp);
             // 1. save PARAMs
             while(a->code->ir_kind == IR_ARG){
                 a = a->next;
@@ -337,11 +418,13 @@ void print_mips(FILE* fp, InterCodes *start){
                 spill(fp, func_args->arg, 0);
                 func_args = func_args->next;
             }
+            pop_tempos(fp);
             fprintf(fp, "\tmove $t0, $v0\n");
             spill(fp, ir->lr.op1, 0);
             Assert(arg_cnt == 0);
             break;
         case IR_CALL_FUNC: // no args
+            push_tempos(fp);
             push_ra(fp);
             if(strcmp(ir->lr.op2->func_name, "main")!=0){
                 fprintf(fp, "\tjal lcx_%s\n", ir->lr.op2->func_name);
@@ -353,6 +436,7 @@ void print_mips(FILE* fp, InterCodes *start){
             fprintf(fp, "\tmove $t0, $v0\n");
             spill(fp, ir->lr.op1, 0);
             pop_ra(fp);
+            pop_tempos(fp);
             break;
         case IR_RETURN:
             Assert(cur_function!=NULL);
