@@ -149,10 +149,6 @@ write:
 	jr $ra
 
 lcx_dot_product:
-	lw $t0, 4($sp)
-	sw $t0, v1
-	lw $t0, 8($sp)
-	sw $t0, v2
 	lw $t1, v1
 	move $t0, $t1
 	sw $t0, t5
@@ -262,12 +258,6 @@ lcx_dot_product:
 	jr $ra
 
 lcx_cross_product:
-	lw $t0, 4($sp)
-	sw $t0, v3
-	lw $t0, 8($sp)
-	sw $t0, v4
-	lw $t0, 12($sp)
-	sw $t0, v5
 	lw $t1, v3
 	move $t0, $t1
 	sw $t0, t33
@@ -632,56 +622,222 @@ label6:
 	lw $t1, v9
 	move $t0, $t1
 	sw $t0, t116
+	addi $sp, $sp, -76
+	lw $t0, t118
+	sw $t0, 72($sp)
+	lw $t0, t117
+	sw $t0, 68($sp)
+	lw $t0, t115
+	sw $t0, 64($sp)
+	lw $t0, t112
+	sw $t0, 60($sp)
+	lw $t0, t109
+	sw $t0, 56($sp)
+	lw $t0, t108
+	sw $t0, 52($sp)
+	lw $t0, t107
+	sw $t0, 48($sp)
+	lw $t0, t106
+	sw $t0, 44($sp)
+	lw $t0, t96
+	sw $t0, 40($sp)
+	lw $t0, t100
+	sw $t0, 36($sp)
+	lw $t0, t102
+	sw $t0, 32($sp)
+	lw $t0, t101
+	sw $t0, 28($sp)
+	lw $t0, t97
+	sw $t0, 24($sp)
+	lw $t0, t99
+	sw $t0, 20($sp)
+	lw $t0, t98
+	sw $t0, 16($sp)
+	lw $t0, v7
+	sw $t0, 12($sp)
+	lw $t0, v6
+	sw $t0, 8($sp)
+	lw $t0, v9
+	sw $t0, 4($sp)
+	lw $t0, v8
+	sw $t0, 0($sp)
+	lw $t0, v5
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	lw $t0, t116
+	sw $t0, v5
+	lw $t0, v4
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	lw $t0, t113
+	sw $t0, v4
+	lw $t0, v3
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	lw $t0, t110
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
+	sw $t0, v3
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
 	jal lcx_cross_product
-	move $t0, $v0
-	sw $t0, t117
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t110
+	sw $t0, v5
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t113
+	sw $t0, v4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t116
+	sw $t0, v3
+	lw $t0, 72($sp)
+	sw $t0, t118
+	lw $t0, 68($sp)
+	sw $t0, t117
+	lw $t0, 64($sp)
+	sw $t0, t115
+	lw $t0, 60($sp)
+	sw $t0, t112
+	lw $t0, 56($sp)
+	sw $t0, t109
+	lw $t0, 52($sp)
+	sw $t0, t108
+	lw $t0, 48($sp)
+	sw $t0, t107
+	lw $t0, 44($sp)
+	sw $t0, t106
+	lw $t0, 40($sp)
+	sw $t0, t96
+	lw $t0, 36($sp)
+	sw $t0, t100
+	lw $t0, 32($sp)
+	sw $t0, t102
+	lw $t0, 28($sp)
+	sw $t0, t101
+	lw $t0, 24($sp)
+	sw $t0, t97
+	lw $t0, 20($sp)
+	sw $t0, t99
+	lw $t0, 16($sp)
+	sw $t0, t98
+	lw $t0, 12($sp)
+	sw $t0, v7
+	lw $t0, 8($sp)
+	sw $t0, v6
+	lw $t0, 4($sp)
+	sw $t0, v9
+	lw $t0, 0($sp)
+	sw $t0, v8
+	addi $sp, $sp, 76
+	move $t0, $v0
+	sw $t0, t117
 	lw $t1, v9
 	move $t0, $t1
 	sw $t0, t119
 	lw $t1, v9
 	move $t0, $t1
 	sw $t0, t120
+	addi $sp, $sp, -76
+	lw $t0, t118
+	sw $t0, 72($sp)
+	lw $t0, t117
+	sw $t0, 68($sp)
+	lw $t0, t115
+	sw $t0, 64($sp)
+	lw $t0, t112
+	sw $t0, 60($sp)
+	lw $t0, t109
+	sw $t0, 56($sp)
+	lw $t0, t108
+	sw $t0, 52($sp)
+	lw $t0, t107
+	sw $t0, 48($sp)
+	lw $t0, t106
+	sw $t0, 44($sp)
+	lw $t0, t96
+	sw $t0, 40($sp)
+	lw $t0, t100
+	sw $t0, 36($sp)
+	lw $t0, t102
+	sw $t0, 32($sp)
+	lw $t0, t101
+	sw $t0, 28($sp)
+	lw $t0, t97
+	sw $t0, 24($sp)
+	lw $t0, t99
+	sw $t0, 20($sp)
+	lw $t0, t98
+	sw $t0, 16($sp)
+	lw $t0, v7
+	sw $t0, 12($sp)
+	lw $t0, v6
+	sw $t0, 8($sp)
+	lw $t0, v9
+	sw $t0, 4($sp)
+	lw $t0, v8
+	sw $t0, 0($sp)
+	lw $t0, v2
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
 	lw $t0, t120
+	sw $t0, v2
+	lw $t0, v1
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	lw $t0, t119
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
+	sw $t0, v1
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
 	jal lcx_dot_product
-	move $t0, $v0
-	sw $t0, t118
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t119
+	sw $t0, v2
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t120
+	sw $t0, v1
+	lw $t0, 72($sp)
+	sw $t0, t118
+	lw $t0, 68($sp)
+	sw $t0, t117
+	lw $t0, 64($sp)
+	sw $t0, t115
+	lw $t0, 60($sp)
+	sw $t0, t112
+	lw $t0, 56($sp)
+	sw $t0, t109
+	lw $t0, 52($sp)
+	sw $t0, t108
+	lw $t0, 48($sp)
+	sw $t0, t107
+	lw $t0, 44($sp)
+	sw $t0, t106
+	lw $t0, 40($sp)
+	sw $t0, t96
+	lw $t0, 36($sp)
+	sw $t0, t100
+	lw $t0, 32($sp)
+	sw $t0, t102
+	lw $t0, 28($sp)
+	sw $t0, t101
+	lw $t0, 24($sp)
+	sw $t0, t97
+	lw $t0, 20($sp)
+	sw $t0, t99
+	lw $t0, 16($sp)
+	sw $t0, t98
+	lw $t0, 12($sp)
+	sw $t0, v7
+	lw $t0, 8($sp)
+	sw $t0, v6
+	lw $t0, 4($sp)
+	sw $t0, v9
+	lw $t0, 0($sp)
+	sw $t0, v8
+	addi $sp, $sp, 76
+	move $t0, $v0
+	sw $t0, t118
 	lw $t0, t118
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
@@ -693,6 +849,7 @@ label6:
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
+	addi $sp, $sp, 36
 	li $t0, 0
 	move $v0, $t0
 	jr $ra

@@ -265,6 +265,7 @@ label15:
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
+	addi $sp, $sp, 200
 	li $t0, 0
 	move $v0, $t0
 	jr $ra

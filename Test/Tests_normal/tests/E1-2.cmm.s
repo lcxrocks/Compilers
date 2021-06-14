@@ -73,8 +73,6 @@ write:
 	jr $ra
 
 lcx_cal_bmi:
-	lw $t0, 4($sp)
-	sw $t0, v1
 	lw $t1, v1
 	move $t0, $t1
 	sw $t0, t3
@@ -265,19 +263,103 @@ label5:
 	lw $t2, t39
 	add $t0, $t1, $t2
 	sw $t0, t37
-	lw $t0, t37
+	addi $sp, $sp, -80
+	lw $t0, t47
+	sw $t0, 76($sp)
+	lw $t0, t46
+	sw $t0, 72($sp)
+	lw $t0, t45
+	sw $t0, 68($sp)
+	lw $t0, t41
+	sw $t0, 64($sp)
+	lw $t0, t40
+	sw $t0, 60($sp)
+	lw $t0, t39
+	sw $t0, 56($sp)
+	lw $t0, t36
+	sw $t0, 52($sp)
+	lw $t0, t35
+	sw $t0, 48($sp)
+	lw $t0, t28
+	sw $t0, 44($sp)
+	lw $t0, t29
+	sw $t0, 40($sp)
+	lw $t0, t30
+	sw $t0, 36($sp)
+	lw $t0, t31
+	sw $t0, 32($sp)
+	lw $t0, t27
+	sw $t0, 28($sp)
+	lw $t0, t23
+	sw $t0, 24($sp)
+	lw $t0, t22
+	sw $t0, 20($sp)
+	lw $t0, t18
+	sw $t0, 16($sp)
+	lw $t0, t17
+	sw $t0, 12($sp)
+	lw $t0, v3
+	sw $t0, 8($sp)
+	lw $t0, v4
+	sw $t0, 4($sp)
+	lw $t0, v2
+	sw $t0, 0($sp)
+	lw $t0, v1
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
+	lw $t0, t37
+	sw $t0, v1
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
 	jal lcx_cal_bmi
-	move $t0, $v0
-	sw $t0, t40
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t37
+	sw $t0, v1
+	lw $t0, 76($sp)
+	sw $t0, t47
+	lw $t0, 72($sp)
+	sw $t0, t46
+	lw $t0, 68($sp)
+	sw $t0, t45
+	lw $t0, 64($sp)
+	sw $t0, t41
+	lw $t0, 60($sp)
+	sw $t0, t40
+	lw $t0, 56($sp)
+	sw $t0, t39
+	lw $t0, 52($sp)
+	sw $t0, t36
+	lw $t0, 48($sp)
+	sw $t0, t35
+	lw $t0, 44($sp)
+	sw $t0, t28
+	lw $t0, 40($sp)
+	sw $t0, t29
+	lw $t0, 36($sp)
+	sw $t0, t30
+	lw $t0, 32($sp)
+	sw $t0, t31
+	lw $t0, 28($sp)
+	sw $t0, t27
+	lw $t0, 24($sp)
+	sw $t0, t23
+	lw $t0, 20($sp)
+	sw $t0, t22
+	lw $t0, 16($sp)
+	sw $t0, t18
+	lw $t0, 12($sp)
+	sw $t0, t17
+	lw $t0, 8($sp)
+	sw $t0, v3
+	lw $t0, 4($sp)
+	sw $t0, v4
+	lw $t0, 0($sp)
+	sw $t0, v2
+	addi $sp, $sp, 80
+	move $t0, $v0
+	sw $t0, t40
 	lw $t1, v2
 	li $t2, 1
 	add $t0, $t1, $t2
@@ -333,6 +415,7 @@ label8:
 	sw $t0, v2
 	j label7
 label9:
+	addi $sp, $sp, 200
 	li $t0, 0
 	move $v0, $t0
 	jr $ra

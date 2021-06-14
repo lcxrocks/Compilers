@@ -128,14 +128,6 @@ write:
 	jr $ra
 
 lcx_merge:
-	lw $t0, 4($sp)
-	sw $t0, v1
-	lw $t0, 8($sp)
-	sw $t0, v2
-	lw $t0, 12($sp)
-	sw $t0, v3
-	lw $t0, 16($sp)
-	sw $t0, v4
 	addi $sp, $sp, -40
 	sw $sp, v6
 	addi $sp, $sp, -40
@@ -493,17 +485,12 @@ label18:
 	sw $t0, v9
 	j label17
 label19:
+	addi $sp, $sp, 80
 	li $t0, 0
 	move $v0, $t0
 	jr $ra
 
 lcx_merge_sort:
-	lw $t0, 4($sp)
-	sw $t0, v12
-	lw $t0, 8($sp)
-	sw $t0, v13
-	lw $t0, 12($sp)
-	sw $t0, v14
 	li $t0, 0
 	sw $t0, v15
 	lw $t0, v13
@@ -534,31 +521,83 @@ label21:
 	lw $t1, v12
 	move $t0, $t1
 	sw $t0, t69
+	addi $sp, $sp, -44
+	lw $t0, t75
+	sw $t0, 40($sp)
+	lw $t0, t73
+	sw $t0, 36($sp)
+	lw $t0, t72
+	sw $t0, 32($sp)
+	lw $t0, t70
+	sw $t0, 28($sp)
+	lw $t0, t66
+	sw $t0, 24($sp)
+	lw $t0, t67
+	sw $t0, 20($sp)
+	lw $t0, t68
+	sw $t0, 16($sp)
 	lw $t0, v15
+	sw $t0, 12($sp)
+	lw $t0, v14
+	sw $t0, 8($sp)
+	lw $t0, v13
+	sw $t0, 4($sp)
+	lw $t0, v12
+	sw $t0, 0($sp)
+	lw $t0, v14
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
+	lw $t0, v15
+	sw $t0, v14
 	lw $t0, v13
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, t69
+	lw $t0, v13
+	sw $t0, v13
+	lw $t0, v12
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
+	lw $t0, t69
+	sw $t0, v12
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
 	jal lcx_merge_sort
-	move $t0, $v0
-	sw $t0, t70
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t69
+	sw $t0, v14
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
 	sw $t0, v13
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
+	sw $t0, v12
+	lw $t0, 40($sp)
+	sw $t0, t75
+	lw $t0, 36($sp)
+	sw $t0, t73
+	lw $t0, 32($sp)
+	sw $t0, t72
+	lw $t0, 28($sp)
+	sw $t0, t70
+	lw $t0, 24($sp)
+	sw $t0, t66
+	lw $t0, 20($sp)
+	sw $t0, t67
+	lw $t0, 16($sp)
+	sw $t0, t68
+	lw $t0, 12($sp)
 	sw $t0, v15
+	lw $t0, 8($sp)
+	sw $t0, v14
+	lw $t0, 4($sp)
+	sw $t0, v13
+	lw $t0, 0($sp)
+	sw $t0, v12
+	addi $sp, $sp, 44
+	move $t0, $v0
+	sw $t0, t70
 	lw $t1, v12
 	move $t0, $t1
 	sw $t0, t71
@@ -566,65 +605,171 @@ label21:
 	li $t2, 1
 	add $t0, $t1, $t2
 	sw $t0, t72
-	lw $t0, v14
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
+	addi $sp, $sp, -44
+	lw $t0, t75
+	sw $t0, 40($sp)
+	lw $t0, t73
+	sw $t0, 36($sp)
 	lw $t0, t72
-	addi $sp, $sp, -4
+	sw $t0, 32($sp)
+	lw $t0, t70
+	sw $t0, 28($sp)
+	lw $t0, t66
+	sw $t0, 24($sp)
+	lw $t0, t67
+	sw $t0, 20($sp)
+	lw $t0, t68
+	sw $t0, 16($sp)
+	lw $t0, v15
+	sw $t0, 12($sp)
+	lw $t0, v14
+	sw $t0, 8($sp)
+	lw $t0, v13
+	sw $t0, 4($sp)
+	lw $t0, v12
 	sw $t0, 0($sp)
-	lw $t0, t71
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
-	addi $sp, $sp, -4
-	sw $ra, 0($sp)
-	jal lcx_merge_sort
-	move $t0, $v0
-	sw $t0, t73
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	sw $t0, t71
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	sw $t0, t72
-	lw $t0, 0($sp)
-	addi $sp, $sp, 4
-	sw $t0, v14
-	lw $t1, v12
-	move $t0, $t1
-	sw $t0, t74
 	lw $t0, v14
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, v15
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
+	lw $t0, v14
+	sw $t0, v14
 	lw $t0, v13
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
-	lw $t0, t74
+	lw $t0, t72
+	sw $t0, v13
+	lw $t0, v12
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
+	lw $t0, t71
+	sw $t0, v12
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
-	jal lcx_merge
-	move $t0, $v0
-	sw $t0, t75
+	jal lcx_merge_sort
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t74
+	sw $t0, v14
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
 	sw $t0, v13
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
+	sw $t0, v12
+	lw $t0, 40($sp)
+	sw $t0, t75
+	lw $t0, 36($sp)
+	sw $t0, t73
+	lw $t0, 32($sp)
+	sw $t0, t72
+	lw $t0, 28($sp)
+	sw $t0, t70
+	lw $t0, 24($sp)
+	sw $t0, t66
+	lw $t0, 20($sp)
+	sw $t0, t67
+	lw $t0, 16($sp)
+	sw $t0, t68
+	lw $t0, 12($sp)
 	sw $t0, v15
+	lw $t0, 8($sp)
+	sw $t0, v14
+	lw $t0, 4($sp)
+	sw $t0, v13
+	lw $t0, 0($sp)
+	sw $t0, v12
+	addi $sp, $sp, 44
+	move $t0, $v0
+	sw $t0, t73
+	lw $t1, v12
+	move $t0, $t1
+	sw $t0, t74
+	addi $sp, $sp, -44
+	lw $t0, t75
+	sw $t0, 40($sp)
+	lw $t0, t73
+	sw $t0, 36($sp)
+	lw $t0, t72
+	sw $t0, 32($sp)
+	lw $t0, t70
+	sw $t0, 28($sp)
+	lw $t0, t66
+	sw $t0, 24($sp)
+	lw $t0, t67
+	sw $t0, 20($sp)
+	lw $t0, t68
+	sw $t0, 16($sp)
+	lw $t0, v15
+	sw $t0, 12($sp)
+	lw $t0, v14
+	sw $t0, 8($sp)
+	lw $t0, v13
+	sw $t0, 4($sp)
+	lw $t0, v12
+	sw $t0, 0($sp)
+	lw $t0, v4
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, v14
+	sw $t0, v4
+	lw $t0, v3
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, v15
+	sw $t0, v3
+	lw $t0, v2
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, v13
+	sw $t0, v2
+	lw $t0, v1
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, t74
+	sw $t0, v1
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	jal lcx_merge
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
+	sw $t0, v4
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v3
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v2
+	lw $t0, 0($sp)
+	addi $sp, $sp, 4
+	sw $t0, v1
+	lw $t0, 40($sp)
+	sw $t0, t75
+	lw $t0, 36($sp)
+	sw $t0, t73
+	lw $t0, 32($sp)
+	sw $t0, t72
+	lw $t0, 28($sp)
+	sw $t0, t70
+	lw $t0, 24($sp)
+	sw $t0, t66
+	lw $t0, 20($sp)
+	sw $t0, t67
+	lw $t0, 16($sp)
+	sw $t0, t68
+	lw $t0, 12($sp)
+	sw $t0, v15
+	lw $t0, 8($sp)
 	sw $t0, v14
+	lw $t0, 4($sp)
+	sw $t0, v13
+	lw $t0, 0($sp)
+	sw $t0, v12
+	addi $sp, $sp, 44
+	move $t0, $v0
+	sw $t0, t75
 	li $t0, 0
 	move $v0, $t0
 	jr $ra
@@ -646,9 +791,9 @@ label23:
 	sw $ra, 0($sp)
 	jal read
 	move $t0, $v0
+	sw $t0, t76
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t76
 	lw $t1, v17
 	move $t0, $t1
 	sw $t0, t78
@@ -679,31 +824,83 @@ label24:
 	li $t2, 1
 	sub $t0, $t1, $t2
 	sw $t0, t87
+	addi $sp, $sp, -44
+	lw $t0, t85
+	sw $t0, 40($sp)
+	lw $t0, t84
+	sw $t0, 36($sp)
+	lw $t0, t83
+	sw $t0, 32($sp)
+	lw $t0, t88
+	sw $t0, 28($sp)
 	lw $t0, t87
+	sw $t0, 24($sp)
+	lw $t0, t80
+	sw $t0, 20($sp)
+	lw $t0, t79
+	sw $t0, 16($sp)
+	lw $t0, t76
+	sw $t0, 12($sp)
+	lw $t0, v16
+	sw $t0, 8($sp)
+	lw $t0, v17
+	sw $t0, 4($sp)
+	lw $t0, v18
+	sw $t0, 0($sp)
+	lw $t0, v14
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, t87
+	sw $t0, v14
+	lw $t0, v13
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	li $t0, 0
+	sw $t0, v13
+	lw $t0, v12
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	lw $t0, t86
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
+	sw $t0, v12
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
 	jal lcx_merge_sort
-	move $t0, $v0
-	sw $t0, t88
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t86
+	sw $t0, v14
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, v0
+	sw $t0, v13
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
+	sw $t0, v12
+	lw $t0, 40($sp)
+	sw $t0, t85
+	lw $t0, 36($sp)
+	sw $t0, t84
+	lw $t0, 32($sp)
+	sw $t0, t83
+	lw $t0, 28($sp)
+	sw $t0, t88
+	lw $t0, 24($sp)
 	sw $t0, t87
+	lw $t0, 20($sp)
+	sw $t0, t80
+	lw $t0, 16($sp)
+	sw $t0, t79
+	lw $t0, 12($sp)
+	sw $t0, t76
+	lw $t0, 8($sp)
+	sw $t0, v16
+	lw $t0, 4($sp)
+	sw $t0, v17
+	lw $t0, 0($sp)
+	sw $t0, v18
+	addi $sp, $sp, 44
+	move $t0, $v0
+	sw $t0, t88
 	li $t0, 0
 	sw $t0, v16
 label25:
@@ -746,6 +943,7 @@ label26:
 	sw $t0, v16
 	j label25
 label27:
+	addi $sp, $sp, 24
 	li $t0, 0
 	move $v0, $t0
 	jr $ra

@@ -171,9 +171,9 @@ label40:
 	sw $ra, 0($sp)
 	jal read
 	move $t0, $v0
+	sw $t0, t1
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t1
 	lw $t1, v2
 	move $t0, $t1
 	sw $t0, t3
@@ -881,6 +881,7 @@ label46:
 	sw $t0, v1
 	j label45
 label47:
+	addi $sp, $sp, 40
 	li $t0, 0
 	move $v0, $t0
 	jr $ra

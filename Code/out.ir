@@ -1,102 +1,21 @@
-FUNCTION fact :
+FUNCTION recursive :
 PARAM v1
-IF v1 <= #0 GOTO label1
+v2 := #0
+IF v1 < #1 GOTO label1
 GOTO label2
 LABEL label1 :
-RETURN #1
+RETURN #0
 GOTO label3
 LABEL label2 :
-t3 := v1 - #1
-ARG t3
-t2 := CALL fact
-t1 := t2 * v1
-RETURN t1
+t1 := v1 - #1
+ARG t1
+t2 := CALL recursive
 LABEL label3 :
-FUNCTION isqrt :
-PARAM v2
-v3 := #0
-LABEL label7 :
-IF v3 < v2 GOTO label8
-GOTO label9
-LABEL label8 :
-t4 := v3 * v3
-IF t4 <= v2 GOTO label6
-GOTO label5
-LABEL label6 :
-t6 := v3 + #1
-t7 := v3 + #1
-t5 := t6 * t7
-IF t5 > v2 GOTO label4
-GOTO label5
-LABEL label4 :
-RETURN v3
-LABEL label5 :
-t8 := v3 + #1
-v3 := t8
-GOTO label7
-LABEL label9 :
-t9 := #0 - #1
-RETURN t9
-FUNCTION mod :
-PARAM v4
-PARAM v5
-IF v4 < #0 GOTO label10
-GOTO label13
-LABEL label13 :
-IF v5 <= #0 GOTO label10
-GOTO label11
-LABEL label10 :
-t10 := #0 - #1
-RETURN t10
-GOTO label12
-LABEL label11 :
-t13 := v4 / v5
-t12 := t13 * v5
-t11 := v4 - t12
-RETURN t11
-LABEL label12 :
-FUNCTION is_prime :
-PARAM v6
-v7 := #2
-ARG v6
-t16 := CALL isqrt
-v8 := t16
-LABEL label16 :
-IF v7 <= v8 GOTO label17
-GOTO label18
-LABEL label17 :
-ARG v7
-ARG v6
-t14 := CALL mod
-IF t14 == #0 GOTO label14
-GOTO label15
-LABEL label14 :
-RETURN #0
-LABEL label15 :
-t15 := v7 + #1
-v7 := t15
-GOTO label16
-LABEL label18 :
-RETURN #1
+t3 := v1 + #1
+v2 := t3
+RETURN v2
 FUNCTION main :
-v9 := #2
-READ t19
-v10 := t19
-LABEL label21 :
-ARG v10
-t20 := CALL fact
-IF v9 < t20 GOTO label22
-GOTO label23
-LABEL label22 :
-ARG v9
-t17 := CALL is_prime
-IF t17 != #0 GOTO label19
-GOTO label20
-LABEL label19 :
-WRITE v9
-LABEL label20 :
-t18 := v9 + #1
-v9 := t18
-GOTO label21
-LABEL label23 :
+ARG #5
+t4 := CALL recursive
+WRITE t4
 RETURN #0

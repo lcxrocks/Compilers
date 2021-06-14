@@ -52,8 +52,6 @@ write:
 	jr $ra
 
 lcx_fact:
-	lw $t0, 4($sp)
-	sw $t0, v1
 	lw $t0, v1
 	li $t1, 0
 	ble $t0, $t1, label1
@@ -68,19 +66,39 @@ label2:
 	li $t2, 1
 	sub $t0, $t1, $t2
 	sw $t0, t3
+	addi $sp, $sp, -16
+	lw $t0, t1
+	sw $t0, 12($sp)
+	lw $t0, t2
+	sw $t0, 8($sp)
 	lw $t0, t3
+	sw $t0, 4($sp)
+	lw $t0, v1
+	sw $t0, 0($sp)
+	lw $t0, v1
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
+	lw $t0, t3
+	sw $t0, v1
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
 	jal lcx_fact
-	move $t0, $v0
-	sw $t0, t2
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
+	sw $t0, v1
+	lw $t0, 12($sp)
+	sw $t0, t1
+	lw $t0, 8($sp)
+	sw $t0, t2
+	lw $t0, 4($sp)
 	sw $t0, t3
+	lw $t0, 0($sp)
+	sw $t0, v1
+	addi $sp, $sp, 16
+	move $t0, $v0
+	sw $t0, t2
 	lw $t1, t2
 	lw $t2, v1
 	mul $t0, $t1, $t2
@@ -91,8 +109,6 @@ label2:
 label3:
 
 lcx_isqrt:
-	lw $t0, 4($sp)
-	sw $t0, v2
 	li $t0, 0
 	sw $t0, v3
 label7:
@@ -149,10 +165,6 @@ label9:
 	jr $ra
 
 lcx_mod:
-	lw $t0, 4($sp)
-	sw $t0, v4
-	lw $t0, 8($sp)
-	sw $t0, v5
 	lw $t0, v4
 	li $t1, 0
 	blt $t0, $t1, label10
@@ -191,23 +203,49 @@ label11:
 label12:
 
 lcx_is_prime:
-	lw $t0, 4($sp)
-	sw $t0, v6
 	li $t0, 2
 	sw $t0, v7
+	addi $sp, $sp, -24
+	lw $t0, t15
+	sw $t0, 20($sp)
+	lw $t0, t14
+	sw $t0, 16($sp)
+	lw $t0, v8
+	sw $t0, 12($sp)
+	lw $t0, t16
+	sw $t0, 8($sp)
+	lw $t0, v7
+	sw $t0, 4($sp)
 	lw $t0, v6
+	sw $t0, 0($sp)
+	lw $t0, v2
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
+	lw $t0, v6
+	sw $t0, v2
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
 	jal lcx_isqrt
-	move $t0, $v0
-	sw $t0, t16
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
+	sw $t0, v2
+	lw $t0, 20($sp)
+	sw $t0, t15
+	lw $t0, 16($sp)
+	sw $t0, t14
+	lw $t0, 12($sp)
+	sw $t0, v8
+	lw $t0, 8($sp)
+	sw $t0, t16
+	lw $t0, 4($sp)
+	sw $t0, v7
+	lw $t0, 0($sp)
 	sw $t0, v6
+	addi $sp, $sp, 24
+	move $t0, $v0
+	sw $t0, t16
 	lw $t1, t16
 	move $t0, $t1
 	sw $t0, v8
@@ -217,25 +255,55 @@ label16:
 	ble $t0, $t1, label17
 	j label18
 label17:
+	addi $sp, $sp, -24
+	lw $t0, t15
+	sw $t0, 20($sp)
+	lw $t0, t14
+	sw $t0, 16($sp)
+	lw $t0, v8
+	sw $t0, 12($sp)
+	lw $t0, t16
+	sw $t0, 8($sp)
 	lw $t0, v7
+	sw $t0, 4($sp)
+	lw $t0, v6
+	sw $t0, 0($sp)
+	lw $t0, v5
+	addi $sp, $sp, -4
+	sw $t0, 0($sp)
+	lw $t0, v7
+	sw $t0, v5
+	lw $t0, v4
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
 	lw $t0, v6
-	addi $sp, $sp, -4
-	sw $t0, 0($sp)
+	sw $t0, v4
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
 	jal lcx_mod
-	move $t0, $v0
-	sw $t0, t14
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, v6
+	sw $t0, v5
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
+	sw $t0, v4
+	lw $t0, 20($sp)
+	sw $t0, t15
+	lw $t0, 16($sp)
+	sw $t0, t14
+	lw $t0, 12($sp)
+	sw $t0, v8
+	lw $t0, 8($sp)
+	sw $t0, t16
+	lw $t0, 4($sp)
 	sw $t0, v7
+	lw $t0, 0($sp)
+	sw $t0, v6
+	addi $sp, $sp, 24
+	move $t0, $v0
+	sw $t0, t14
 	lw $t0, t14
 	li $t1, 0
 	beq $t0, $t1, label14
@@ -265,44 +333,100 @@ main:
 	sw $ra, 0($sp)
 	jal read
 	move $t0, $v0
+	sw $t0, t19
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t19
 	lw $t1, t19
 	move $t0, $t1
 	sw $t0, v10
 label21:
+	addi $sp, $sp, -24
+	lw $t0, t18
+	sw $t0, 20($sp)
+	lw $t0, t17
+	sw $t0, 16($sp)
+	lw $t0, t20
+	sw $t0, 12($sp)
 	lw $t0, v10
+	sw $t0, 8($sp)
+	lw $t0, t19
+	sw $t0, 4($sp)
+	lw $t0, v9
+	sw $t0, 0($sp)
+	lw $t0, v1
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
+	lw $t0, v10
+	sw $t0, v1
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
 	jal lcx_fact
-	move $t0, $v0
-	sw $t0, t20
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
+	sw $t0, v1
+	lw $t0, 20($sp)
+	sw $t0, t18
+	lw $t0, 16($sp)
+	sw $t0, t17
+	lw $t0, 12($sp)
+	sw $t0, t20
+	lw $t0, 8($sp)
 	sw $t0, v10
+	lw $t0, 4($sp)
+	sw $t0, t19
+	lw $t0, 0($sp)
+	sw $t0, v9
+	addi $sp, $sp, 24
+	move $t0, $v0
+	sw $t0, t20
 	lw $t0, v9
 	lw $t1, t20
 	blt $t0, $t1, label22
 	j label23
 label22:
+	addi $sp, $sp, -24
+	lw $t0, t18
+	sw $t0, 20($sp)
+	lw $t0, t17
+	sw $t0, 16($sp)
+	lw $t0, t20
+	sw $t0, 12($sp)
+	lw $t0, v10
+	sw $t0, 8($sp)
+	lw $t0, t19
+	sw $t0, 4($sp)
 	lw $t0, v9
+	sw $t0, 0($sp)
+	lw $t0, v6
 	addi $sp, $sp, -4
 	sw $t0, 0($sp)
+	lw $t0, v9
+	sw $t0, v6
 	addi $sp, $sp, -4
 	sw $ra, 0($sp)
 	jal lcx_is_prime
-	move $t0, $v0
-	sw $t0, t17
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4
+	sw $t0, v6
+	lw $t0, 20($sp)
+	sw $t0, t18
+	lw $t0, 16($sp)
+	sw $t0, t17
+	lw $t0, 12($sp)
+	sw $t0, t20
+	lw $t0, 8($sp)
+	sw $t0, v10
+	lw $t0, 4($sp)
+	sw $t0, t19
+	lw $t0, 0($sp)
 	sw $t0, v9
+	addi $sp, $sp, 24
+	move $t0, $v0
+	sw $t0, t17
 	lw $t0, t17
 	li $t1, 0
 	bne $t0, $t1, label19

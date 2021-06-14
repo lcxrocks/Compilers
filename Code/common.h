@@ -155,7 +155,7 @@ struct FuncRecord_{
 #define printk printf
 
 // assert.h
-//#define NDEBUG
+#define NDEBUG
 
 #ifdef NDEBUG
   #define Assert(cond) 1

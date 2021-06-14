@@ -133,8 +133,12 @@ void init_memory(FILE* fp, InterCodes *start){
         ArgList* temps = func_tmp->tempos;
         while (temps!=NULL)
         {
-            if(temps->arg->op_kind==OP_VARIABLE) log("v%d, offset: %d\n", temps->arg->var_no, temps->offset);
-            else log("t%d, offset: %d\n", temps->arg->tmp_no, temps->offset);
+            if(temps->arg->op_kind==OP_VARIABLE){
+                log("v%d, offset: %d\n", temps->arg->var_no, temps->offset);
+            }
+            else{
+                log("t%d, offset: %d\n", temps->arg->tmp_no, temps->offset);
+            } 
             temps = temps->next;
         }
         func_tmp = func_tmp->next;

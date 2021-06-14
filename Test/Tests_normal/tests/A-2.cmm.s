@@ -51,9 +51,9 @@ main:
 	sw $ra, 0($sp)
 	jal read
 	move $t0, $v0
+	sw $t0, t2
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t2
 	lw $t1, t2
 	move $t0, $t1
 	sw $t0, v1
@@ -61,9 +61,9 @@ main:
 	sw $ra, 0($sp)
 	jal read
 	move $t0, $v0
+	sw $t0, t3
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t3
 	lw $t1, t3
 	move $t0, $t1
 	sw $t0, v7
@@ -71,9 +71,9 @@ main:
 	sw $ra, 0($sp)
 	jal read
 	move $t0, $v0
+	sw $t0, t4
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t4
 	lw $t1, t4
 	move $t0, $t1
 	sw $t0, v3
@@ -81,9 +81,9 @@ main:
 	sw $ra, 0($sp)
 	jal read
 	move $t0, $v0
+	sw $t0, t5
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t5
 	lw $t1, t5
 	move $t0, $t1
 	sw $t0, v5
@@ -91,9 +91,9 @@ main:
 	sw $ra, 0($sp)
 	jal read
 	move $t0, $v0
+	sw $t0, t6
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t6
 	lw $t1, t6
 	move $t0, $t1
 	sw $t0, v9
@@ -101,9 +101,9 @@ main:
 	sw $ra, 0($sp)
 	jal read
 	move $t0, $v0
+	sw $t0, t7
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t7
 	lw $t1, t7
 	move $t0, $t1
 	sw $t0, v15
@@ -111,9 +111,9 @@ main:
 	sw $ra, 0($sp)
 	jal read
 	move $t0, $v0
+	sw $t0, t8
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t8
 	lw $t1, t8
 	move $t0, $t1
 	sw $t0, v11
@@ -121,9 +121,9 @@ main:
 	sw $ra, 0($sp)
 	jal read
 	move $t0, $v0
+	sw $t0, t9
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	sw $t0, t9
 	lw $t1, t9
 	move $t0, $t1
 	sw $t0, v13
