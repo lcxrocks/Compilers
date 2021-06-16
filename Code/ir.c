@@ -478,7 +478,6 @@ void translate_Exp(struct Node *Exp, Operand *place){
         Operand *base_addr = new_temp();
         translate_Exp(fc, base_addr);
         
-        
         // get offset:
         struct Node *ID = fc->next_sib->next_sib;
         Assert(IS(ID, "ID"));
@@ -969,8 +968,6 @@ void print_ir(FILE *fp, InterCodes *start){
             break;
         case IR_ARG: 
             fprintf(fp, "ARG ");
-            // if(ir->unop.op->op_kind==OP_ADDRESS)
-            //     fprintf(fp, "&");
             print_op(fp, ir->unop.op);
             break;
         case IR_CALL_FUNC: 
