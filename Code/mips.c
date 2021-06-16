@@ -148,7 +148,7 @@ void init_memory(FILE* fp, InterCodes *start){
         }
         func_tmp = func_tmp->next;
     }
-    init_var(fp, var_cnt, temp_cnt);
+    //init_var(fp, var_cnt, temp_cnt);
 }
 
 void init_mips(FILE* fp, InterCodes *start){
