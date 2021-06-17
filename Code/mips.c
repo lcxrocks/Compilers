@@ -68,6 +68,18 @@ void init_write(FILE* fp){
     fprintf(fp, "\tjr $ra\n");
 }
 
+void init_record(Operand *x){
+    if(x->op_kind == OP_FUNCTION) return;
+    if(search_tempo(record_head, x)==NULL){
+        ArgList* new_tempo = (ArgList *)malloc(sizeof(ArgList));
+        new_tempo->arg = x;
+        new_tempo->next = record_head->tempos;
+        new_tempo->offset = record_head->tempo_size;
+        record_head->tempos = new_tempo;
+        record_head->tempo_size+=4;
+    }
+}
+
 void init_memory(FILE* fp, InterCodes *start){
     // should keep record of exsisting var/temp  
     int function_cnt = 0;
@@ -104,19 +116,26 @@ void init_memory(FILE* fp, InterCodes *start){
                 record_head = func;
             }
         }
-        else if(ir->unop.op->op_kind == OP_VARIABLE || \
+        else if(ir->ir_kind == IR_ADD || ir->ir_kind == IR_SUB ||\
+               ir->ir_kind == IR_MUL || ir->ir_kind == IR_DIV){
+            Assert(record_head!=NULL);
+            init_record(ir->binop.result);
+            init_record(ir->binop.op1);
+            init_record(ir->binop.op2);
+        }
+        else if(ir->ir_kind == IR_ASSIGN || ir->ir_kind == IR_GET_ADDR || \
+                ir->ir_kind == IR_GET_ADDR_VAL || ir->ir_kind == IR_TO_ADDR || \
+                ir->ir_kind == IR_CALL_FUNC){
+            Assert(record_head!=NULL);
+            init_record(ir->lr.op1);
+            init_record(ir->lr.op2);
+        }
+        else{
+            if(ir->unop.op->op_kind == OP_VARIABLE || \
                 ir->unop.op->op_kind == OP_TEMP || \
                 ir->unop.op->op_kind == OP_ADDRESS){
-            Assert(record_head!=NULL);
-            if(search_tempo(record_head, ir->unop.op)==NULL){
-                ArgList* new_tempo = (ArgList *)malloc(sizeof(ArgList));
-                new_tempo->arg = ir->unop.op;
-                new_tempo->next = record_head->tempos;
-                new_tempo->offset = record_head->tempo_size;
-                record_head->tempos = new_tempo;
-                record_head->tempo_size+=4;
+            init_record(ir->unop.op);
             }
-            //log("found v%d\n", ir->unop.op->var_no);
         }
         p = p->next;
     }
@@ -212,7 +231,6 @@ void pop_ra(FILE* fp){
 
 void malloc_tempos(FILE* fp){
     Assert(cur_function!=NULL);
-    Assert(cur_function->tempo_size%4==0);
     fprintf(fp, "\taddi $sp, $sp, -%d\n", cur_function->tempo_size);
 }
 
@@ -220,7 +238,6 @@ void free_tempos(FILE* fp){
     Assert(cur_function!=NULL);
     fprintf(fp, "\taddi $t4, $fp, -8\n");
     fprintf(fp, "\tmove $sp, $t4\n");
-    //fprintf(fp, "\taddi $sp, $sp, %d\n", cur_function->tempo_size+cur_function->array_size);
 }
 
 void print_mips(FILE* fp, InterCodes *start){
