@@ -218,7 +218,9 @@ void malloc_tempos(FILE* fp){
 
 void free_tempos(FILE* fp){
     Assert(cur_function!=NULL);
-    fprintf(fp, "\taddi $sp, $sp, %d\n", cur_function->tempo_size+cur_function->array_size);
+    fprintf(fp, "\taddi $t4, $fp, -8\n");
+    fprintf(fp, "\tmove $sp, $t4\n");
+    //fprintf(fp, "\taddi $sp, $sp, %d\n", cur_function->tempo_size+cur_function->array_size);
 }
 
 void print_mips(FILE* fp, InterCodes *start){
@@ -297,14 +299,14 @@ void print_mips(FILE* fp, InterCodes *start){
         case IR_READ:
             push_ra(fp);
             fprintf(fp, "\tjal read\n");
-            fprintf(fp, "\tmove $t0, $v0\n");
             pop_ra(fp);
+            fprintf(fp, "\tmove $t0, $v0\n");
             spill(fp, ir->unop.op, 0);
             break;
         case IR_WRITE: 
             reg(fp, ir->unop.op, 0);
-            push_ra(fp);
             fprintf(fp, "\tmove $a0, $t0\n");
+            push_ra(fp);
             fprintf(fp, "\tjal write\n");
             pop_ra(fp);
             break;
@@ -346,11 +348,11 @@ void print_mips(FILE* fp, InterCodes *start){
             if(strcmp(ir->lr.op2->func_name, "main")!=0){
                 push_ra(fp);
                 fprintf(fp, "\tjal lcx_%s\n", ir->lr.op2->func_name);
+                pop_ra(fp);
             }  
             else{
                 fprintf(fp, "\tjal main\n");
             }
-            pop_ra(fp);
             if(arg_offset!=0) {
                 Assert(arg_offset%4==0);
                 fprintf(fp, "\taddi $sp, $sp, %d\n", arg_offset);
@@ -363,6 +365,7 @@ void print_mips(FILE* fp, InterCodes *start){
             Assert(cur_function!=NULL);
             reg(fp, ir->unop.op, 0);
             free_tempos(fp);
+            if(strcmp(cur_function->func_name, "main")==0) pop_ra(fp);
             fprintf(fp, "\tmove $v0, $t0\n");
             fprintf(fp, "\tjr $ra\n");
             break;
