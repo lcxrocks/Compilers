@@ -130,6 +130,12 @@ void init_memory(FILE* fp, InterCodes *start){
             init_record(ir->lr.op1);
             init_record(ir->lr.op2);
         }
+        else if(ir->ir_kind == IR_IF){
+            Assert(record_head!=NULL);
+            init_record(ir->cond.op1);
+            init_record(ir->cond.op2);
+            init_record(ir->cond.op3); 
+        }
         else{
             if(ir->unop.op->op_kind == OP_VARIABLE || \
                 ir->unop.op->op_kind == OP_TEMP || \
